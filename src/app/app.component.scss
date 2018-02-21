@@ -1,0 +1,17 @@
+.topbar{
+  position: fixed;
+  top: 0;
+  background-color: rgba(crimson, 1);
+  //border-bottom: solid 1px darken(dimgray,10%);
+  box-shadow: 0px 1px 12px 1px lighten(black,20%);
+  z-index: 1;
+}
+
+//.router-outlet {
+//  position: fixed;
+//  border: 1px solid black;
+//  margin-top: 64px;
+//  color: red;
+//  margin: 0;
+//  padding:0;
+//}

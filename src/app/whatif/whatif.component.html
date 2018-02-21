@@ -1,0 +1,15 @@
+<p class="topbar-spacer">sss</p>
+<div class="banner">
+<mat-toolbar>
+  <button (click)="toggle()" mat-raised-button>Settings</button>
+</mat-toolbar>
+</div>
+<mat-sidenav-container  >
+  <mat-sidenav mode="over" #sidenav opened="toggle()">
+    <mat-tab-group>
+      <mat-tab label="model inputs"></mat-tab>
+      <mat-tab label="layout view"></mat-tab>
+    </mat-tab-group>
+  </mat-sidenav>
+xx xx
+</mat-sidenav-container>
