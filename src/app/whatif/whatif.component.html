@@ -43,8 +43,9 @@
         <tr><td>a table here</td></tr>
         <ng-container *ngFor="let item of data$ | async">
             <div class="table">
-                <div class="table-col">
-
+                <div class="tbl-col">
+                    <div class="tbl-cell"></div>
+{{item.}}
                 </div>
             </div>
             <td>{{item|json}}</td> <td>{{item|json}}</td>

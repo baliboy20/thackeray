@@ -18,3 +18,16 @@ mat-sidenav-container {
   //
   height: calc(100vh);
 }
+
+
+.table {
+  display: flex;
+  flex-flow: row nowrap;
+  background-color: crimson;
+}
+
+.tbl-col {
+  display:flex ;
+  flex-flow: column nowrap;
+  background-color: greenyellow;
+}

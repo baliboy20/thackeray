@@ -49,7 +49,7 @@ export class VisitorService {
     }
 
     getForecast(from1: string, to: string, interval1: PeriodOfString, forecastmodel?: any) {
-        return ForecastModelBasic.baseModel(from1, to, interval1) ;
+        return ForecastModelBasic.baseModel(from1, to, interval1);
     }
 
 }
@@ -98,6 +98,12 @@ const computeVariableCosts: (a: CostSalesSequent) => CostSalesSequent = (a: Cost
     a.variableCosts = (a as VisitorSequent).visitors * 5.5 * .33;
     return a;
 };
+const computeCumTotals: (a: CostSalesSequent, b: CostSalesSequent) => CostSalesSequent =
+    (prev: CostSalesSequent, curr: CostSalesSequent) => {
+        curr.cumVat += prev.cumVat;
+        curr.cumProfit += prev.cumProfit;
+        return curr;
+    };
 const computeSales: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
     a.netSales = (a as VisitorSequent).visitors * 5.5 * .66;
     a.vatSales = (a as VisitorSequent).visitors * 5.5 * .66 * 1.2;
@@ -109,6 +115,11 @@ export interface CostSalesSequent extends VisitorSequent {
     variableCosts: number;
     netSales: number;
     vatSales: number;
+    totalCosts: number;
+    profit: number;
+    cashflow: number;
+    cumVat: number;
+    cumProfit: number;
 }
 
 const monthlyVisitorBias = {
@@ -395,7 +406,8 @@ export class ForecastModelBasic {
             .map((a: DateSequent) => VisitorSequentFactory(a, 100))
             .map(a => computeFixedCosts(a))
             .map(a => computeVariableCosts(a))
-            .map(a => computeSales(a));
+            .map(a => computeSales(a))
+            .scan(computeCumTotals);
     }
 
 }
