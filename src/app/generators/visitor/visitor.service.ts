@@ -11,10 +11,16 @@ import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/scan';
+import 'rxjs/add/operator/groupBy';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/zip';
 import 'rxjs/add/operator/zipAll';
 import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/count';
+import 'rxjs/add/operator/toArray';
+import 'rxjs/add/operator/reduce';
+import 'rxjs/add/operator/do';
 import {interval} from 'rxjs/observable/interval';
 import * as moment from 'moment';
 import {Duration, Moment} from 'moment';
@@ -24,6 +30,12 @@ import {Observer} from 'rxjs/Observer';
 import {merge} from 'rxjs/operator/merge';
 import {mergeAll} from 'rxjs/operator/mergeAll';
 import {concat} from 'rxjs/operator/concat';
+import {groupBy} from 'rxjs/operator/groupBy';
+import {of} from 'rxjs/observable/of';
+import {GroupedObservable} from 'rxjs/operators/groupBy';
+import {toArray} from 'rxjs/operator/toArray';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
 
 // import {let} from 'rxjs/operators';
 
@@ -36,8 +48,8 @@ export class VisitorService {
     constructor() {
     }
 
-    getForecast(from1: Date, to: Date, interval1: string, forecastmodel: any) {
-        return ForecastModelBasic.callZip();
+    getForecast(from1: string, to: string, interval1: PeriodOfString, forecastmodel?: any) {
+        return ForecastModelBasic.baseModel(from1, to, interval1) ;
     }
 
 }
@@ -50,8 +62,84 @@ interface Dayts {
     dayNo: number;
 }
 
+interface DateSequent {
+    dayNo: number;
+    month: number;
+    year: number;
+    qtr: number;
+    weekNo: number;
+    date: string;
+    isoWeekday: string;
+}
+
+interface VisitorSequent extends DateSequent {
+    visitors: number;
+}
+
+const VisitorSequentFactory: (ds: DateSequent, visitors) => VisitorSequent = (ds: DateSequent, visitors) => ({
+    dayNo: ds.dayNo,
+    month: ds.month,
+    year: ds.year,
+    qtr: ds.qtr,
+    weekNo: ds.weekNo,
+    date: ds.date,
+    visitors: visitors,
+    isoWeekday: ds.isoWeekday
+} as VisitorSequent);
+
+const computeFixedCosts: (arg: VisitorSequent) => CostSalesSequent = (arg: VisitorSequent) => {
+    const v: number[] = [3, 6, 9, 12];
+    const fc: CostSalesSequent = arg as CostSalesSequent;
+    fc.fixedCosts = (v.includes(arg.month) && moment(arg.date).format('D') === '1') ? 1300 : 0;
+    return fc;
+};
+
+const computeVariableCosts: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
+    a.variableCosts = (a as VisitorSequent).visitors * 5.5 * .33;
+    return a;
+};
+const computeSales: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
+    a.netSales = (a as VisitorSequent).visitors * 5.5 * .66;
+    a.vatSales = (a as VisitorSequent).visitors * 5.5 * .66 * 1.2;
+    return a;
+};
+
+export interface CostSalesSequent extends VisitorSequent {
+    fixedCosts: number;
+    variableCosts: number;
+    netSales: number;
+    vatSales: number;
+}
+
+const monthlyVisitorBias = {
+    '0': .8,
+    '1': 1,
+    '2': 1.02,  // mar
+    '3': 1.03,
+    '4': 1.04,
+    '5': 1.1,
+    '6': 1.2,   // jul
+    '7': 1.1,
+    '8': 1.1,   // sep
+    '9': 1,
+    '10': 1,
+    '11': .7    // dec
+};
+
+const weeklyVisitorBias = {
+    '0': .3, // su
+    '1': .4, // mo
+    '2': .5, // tu
+    '3': 1,  // w
+    '4': 1,  // th
+    '5': .9, // f
+    '6': .3, // sa
+};
+
+
 export class ForecastModelBasic {
 
+    static dateMap: Map<string, any[]> = new Map();
 
     static call() {
         const source$ = range(0, 10);
@@ -114,6 +202,10 @@ export class ForecastModelBasic {
     }
 
     static _dateGen() {
+
+    }
+
+    static _dateGen_() {
         const increr = scan((acc, curr) => {
             acc.total *= 1.01;
             acc.date = curr.date;
@@ -140,7 +232,7 @@ export class ForecastModelBasic {
         const costs = (a) => Observable.of(this._varCosts(a.date)).map(b => ({date: a.date, value: b, label: 'costs'}));
         const rev = (a) => Observable.of(this._varRevs(a.date)).map(b => ({date: a.date, value: b, label: 'revenue'}));
         const zip4 = zip(costs, rev);
-       this.zzMergeAll();
+        this.zzMergeAll();
     }
 
     private static _varCosts(date: string): number {
@@ -150,11 +242,48 @@ export class ForecastModelBasic {
 
     private static _varRevs(date: string): number {
         const dayOfYr = moment(date).diff('2018-01-01', 'days');
-        return -(moment(date).quarter() * 1000 + dayOfYr);
+        return -(moment(date).quarter() * 1004 + dayOfYr);
     }
 
-    static obsDateGenerator(from1: string = '01/01/2018', to: string = '04/01/2018',
-                            bucket: PeriodOfString = 'day'): Observable<number> {
+    static fromDateObservable(from1: string = '01/01/2018', to: string = '04/01/2018',
+                              gap: PeriodOfString = 'day'): Observable<DateSequent> {
+        return Observable.create((observer: Observer<Dayts>) => {
+                let d = 0;
+                let moDate = moment(from1);
+
+                while (moDate.isSameOrBefore(to)) {
+                    moDate = moment(from1).add(d, 'd');
+                    const v: Dayts = {
+                        dateBucket: gap,
+                        dayNo: d,
+                        month: moment(moDate).month() + 1,
+                        year: moment(moDate).year(),
+                        qtr: moment(moDate).quarter(),
+                        weekNo: moment(moDate).isoWeek(),
+                        isoWeekday: moment(moDate).isoWeekday(),
+                        date: moDate.format('DD-MMM-YYYY'),
+                    } as Dayts;
+                    observer.next(v);
+                    d++;
+                    if (d > 2140) {
+                        break;
+                    }
+                }
+                observer.complete();
+            }
+        );
+    }
+
+
+    /**
+     * Visitor numbers have two trend annual footfall,
+     * @param {string} from1
+     * @param {string} to
+     * @param {PeriodOfString} bucket
+     * @returns {Observable<number>}
+     */
+    static observableVistorGenerator(from1: string = '01/01/2018', to: string = '04/01/2018',
+                                     bucket: PeriodOfString = 'day'): Observable<number> {
         return Observable.create((observer: Observer<Dayts>) => {
                 let frm = from1;
                 let dayno = 0;
@@ -176,14 +305,97 @@ export class ForecastModelBasic {
         );
     }
 
+    /**
+     *
+     */
     static zzMergeAll() {
-        const costs = (a) => Observable.of(this._varCosts(a.date)).map(b => ({date: a.date, value: b, label: 'costs'}));
-        const rev = (a) => Observable.of(this._varRevs(a.date)).map(b => ({date: a.date, value: b, label: 'revenue'}));
+        const costs = (a) => ({date: a, value: this._varCosts(a.date), label: 'costs'});
 
-        // this.obsDateGenerator().pipe(map(costs), flatMap((x)=>x),).subscribe(console.log);
+        const rev = (a) => ({date: a, value: this._varRevs(a.date), label: 'revenue'});
+        const op = (...stms) => {
+            return (source) => {
+                return Observable.create(subscriber => {
+                    const subscription = source.subscribe(value => {
+                        stms.forEach(func => {
+                            subscriber.next((func(value.date)));
+                            console.log('....=>');
+                        });
+                    });
+                    return subscription;
+                });
+            };
+        };
+
+        const reducer = reduce((x, y) => {
+            const acc = {key: '', sum: 0, values: []};
+            // console.log(y);
+            acc.sum = y['value'];
+            acc.values.push(y);
+            acc.key = 'tobeadded';
+            return acc;
+        }, {sum: 0, key: '', values: []});
+
+        const writer = a => a.subscribe(b => console.log('sub subscribe', b));
+
+
+        const sumr = (a: GroupedObservable<any, any>) => {
+            // console.log('sumr', a);
+            return a.reduce((x, y) => x + y, 0);
+        };
+        const assigner = (a, b) => {
+            a['key'] = b['key'];
+            return a;
+        };
+
+        // this.obsDateGenerator('01/01/2018', '5/05/2018')
+        //     .pipe(op(costs, rev))
+        //     // .do(console.log)
+        //     .groupBy(a => moment(a['date']).dayOfYear())
+        //     // .flatMap(a => a.toArray())
+        //     // .subscribe((console.log));
+        //     .subscribe(obs => obs.pipe(take(2), map(a => {
+        //         return assigner(a, obs);
+        //     })).subscribe(console.log));
+
+    }
+
+    // static  gapDates: ReplaySubject<any> = new ReplaySubject<any>('value of gapdates');
+
+    /**
+     *
+     dayNo: d,
+     month: moment(moDate).month() + 1,
+     Year: moment(moDate).year(),
+     qtr: moment(moDate).quarter(),
+     weekNo: moment(moDate).isoWeek(),
+     date: moDate.format('DD-MMM-YYYY'),
+     */
+
+    static computeVisitors(baseVisitorNo: number, monthno: number, isoWeekday: 1 | 2 | 3 | 4 | 5 | 6 | 7) {
+        return baseVisitorNo * weeklyVisitorBias[isoWeekday] * monthlyVisitorBias[monthno];
     }
 
     static callZip() {
-        this._dateGen();
+        console.clear();
+        // todo addin map cache
+
+        this.fromDateObservable('01-08-2018', '06-28-2018', 'month')
+            .map((a: DateSequent) => VisitorSequentFactory(a, 100))
+            .map(a => computeFixedCosts(a))
+            .map(a => computeVariableCosts(a))
+            .map(a => computeSales(a))
+            .subscribe(console.log);
+
+        console.log('day', moment().get('day'));
     }
+
+    static baseModel(from1: string = '01/01/2018', to: string = '04/01/2018',
+                     gap: PeriodOfString = 'day'): Observable<CostSalesSequent> {
+        return this.fromDateObservable(from1, to, gap)
+            .map((a: DateSequent) => VisitorSequentFactory(a, 100))
+            .map(a => computeFixedCosts(a))
+            .map(a => computeVariableCosts(a))
+            .map(a => computeSales(a));
+    }
+
 }

@@ -1,15 +1,54 @@
 <p class="topbar-spacer">sss</p>
 <div class="banner">
-<mat-toolbar>
-  <button (click)="toggle()" mat-raised-button>Settings</button>
-</mat-toolbar>
+    <mat-toolbar>
+        <button (click)="toggle()" mat-raised-button>Settings</button>
+    </mat-toolbar>
 </div>
-<mat-sidenav-container  >
-  <mat-sidenav mode="over" #sidenav opened="toggle()">
-    <mat-tab-group>
-      <mat-tab label="model inputs"></mat-tab>
-      <mat-tab label="layout view"></mat-tab>
-    </mat-tab-group>
-  </mat-sidenav>
-xx xx
+<mat-sidenav-container>
+    <mat-sidenav mode="over" #sidenav opened="toggle()">
+        <mat-tab-group>
+            <mat-tab label="model inputs">
+                <mat-card>
+                    <form novalidate #fm="ngForm">
+                        <br>
+                        <button mat-raised-button color="primary" (click)="onRecompute()">COMPUTE</button>
+                        <br>
+                        <mat-form-field>
+                            <input matInput
+                                   #pickFrom
+                                   value="2/5/2018"
+                                   [matDatepicker]="pickerFr"
+                                   placeholder="Choose a date"  >
+                            <mat-datepicker-toggle matSuffix [for]="pickerFr"></mat-datepicker-toggle>
+                            <mat-datepicker #pickerFr></mat-datepicker>
+                        </mat-form-field>
+                        <br>
+                        <mat-form-field>
+                            <input matInput
+                                   #pickTo
+                                   value="2/15/2018"
+                                   [matDatepicker]="pickerTo" placeholder="Choose a date" >
+                            <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+                            <mat-datepicker #pickerTo></mat-datepicker>
+                        </mat-form-field>
+                    </form>
+
+                </mat-card>
+            </mat-tab>
+            <mat-tab label="layout view"></mat-tab>
+        </mat-tab-group>
+    </mat-sidenav>
+<mat-card>
+    <table>
+        <tr><td>a table here</td></tr>
+        <ng-container *ngFor="let item of data$ | async">
+            <div class="table">
+                <div class="table-col">
+
+                </div>
+            </div>
+            <td>{{item|json}}</td> <td>{{item|json}}</td>
+        </ng-container>
+    </table>
+</mat-card>
 </mat-sidenav-container>
