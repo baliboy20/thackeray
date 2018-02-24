@@ -36,6 +36,7 @@ import {GroupedObservable} from 'rxjs/operators/groupBy';
 import {toArray} from 'rxjs/operator/toArray';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
+import {error} from 'util';
 
 // import {let} from 'rxjs/operators';
 
@@ -62,6 +63,19 @@ interface Dayts {
     dayNo: number;
 }
 
+export interface CostSalesSequent extends VisitorSequent {
+    fixedCosts: number;
+    variableCosts: number;
+    netSales: number;
+    vatOnSales: number;
+    totalCosts: number;
+    profit: number;
+    cashflow: number;
+    cumVat: number;
+    cumProfit: number;
+    cumCosts: number;
+}
+
 interface DateSequent {
     dayNo: number;
     month: number;
@@ -73,80 +87,107 @@ interface DateSequent {
 }
 
 interface VisitorSequent extends DateSequent {
-    visitors: number;
+    trades: number;
+    tradeBase: number;
 }
 
-const VisitorSequentFactory: (ds: DateSequent, visitors) => VisitorSequent = (ds: DateSequent, visitors) => ({
-    dayNo: ds.dayNo,
-    month: ds.month,
-    year: ds.year,
-    qtr: ds.qtr,
-    weekNo: ds.weekNo,
-    date: ds.date,
-    visitors: visitors,
-    isoWeekday: ds.isoWeekday
-} as VisitorSequent);
+const VisitorSequentFactory: (ds: DateSequent, tradeBase) => VisitorSequent = (ds: DateSequent) =>
+    ({
+        dayNo: ds.dayNo,
+        month: ds.month,
+        year: ds.year,
+        qtr: ds.qtr,
+        weekNo: ds.weekNo,
+        date: ds.date,
+        tradeBase: OperatingCosts.tradesBase,
+        trades: computeVisitors(ds.month, ds.isoWeekday, OperatingCosts.tradesBase),
+        isoWeekday: ds.isoWeekday
+    } as VisitorSequent);
+
+const computeVisitors = (month, isoWeekday, trades) => {
+    const tr = +(trades * monthlyVisitorBias[month] * weeklyVisitorBias[isoWeekday]);
+    //console.log('tr', trades , monthlyVisitorBias[month] , weeklyVisitorBias[isoWeekday]);
+    return tr;
+};
+
+const format2Decimals = (value) => value.toFixed(2);
 
 const computeFixedCosts: (arg: VisitorSequent) => CostSalesSequent = (arg: VisitorSequent) => {
     const v: number[] = [3, 6, 9, 12];
     const fc: CostSalesSequent = arg as CostSalesSequent;
-    fc.fixedCosts = (v.includes(arg.month) && moment(arg.date).format('D') === '1') ? 1300 : 0;
+    const ohds = (v.includes(arg.month) && moment(arg.date).format('D') === '1') ? OperatingCosts.serviceCharge : 0;
+    const rent = moment(arg.date).format('D') === '1' ? OperatingCosts.rent : 0;
+    const staff = OperatingCosts.staffPerDay;
+    fc.fixedCosts = +(ohds + staff + rent).toPrecision(2);
+    fc.cumVat = 0;
+    fc.cumProfit = 0;
+    fc.cashflow = 0;
+    fc.cumCosts = 0;
+    fc.profit = 0;
     return fc;
 };
 
 const computeVariableCosts: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
-    a.variableCosts = (a as VisitorSequent).visitors * 5.5 * .33;
+    a.variableCosts = +((a as VisitorSequent).trades *
+        OperatingCosts.averageSale * .33);
     return a;
 };
-const computeCumTotals: (a: CostSalesSequent, b: CostSalesSequent) => CostSalesSequent =
-    (prev: CostSalesSequent, curr: CostSalesSequent) => {
-        curr.cumVat += prev.cumVat;
-        curr.cumProfit += prev.cumProfit;
+
+const computeTotalCosts: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
+    a.totalCosts = +(a.variableCosts + a.fixedCosts);
+    a.profit = a.netSales - a.totalCosts;
+    return a;
+};
+const computeCumTotals: (a: CostSalesSequent, b: CostSalesSequent, i: number) => CostSalesSequent =
+    (prev: CostSalesSequent, curr: CostSalesSequent, idx: number) => {
+    prev.cumProfit = (idx === 0) ? prev.profit : prev.cumProfit;
+        curr.cumVat += +(prev.vatOnSales).toFixed(2);
+        curr.cumProfit = curr.profit + prev.cumProfit; // +(curr.profit).toFixed(4);
+        curr.cumCosts = +(curr.totalCosts + prev.cumCosts).toFixed(2);
         return curr;
     };
-const computeSales: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
-    a.netSales = (a as VisitorSequent).visitors * 5.5 * .66;
-    a.vatSales = (a as VisitorSequent).visitors * 5.5 * .66 * 1.2;
+const computeNetSales: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
+    a.netSales = (a as VisitorSequent).trades *
+        OperatingCosts.averageSale;
+    a.vatOnSales = (a as VisitorSequent).trades *
+        OperatingCosts.averageSale * .2;
+    // console.log("xxxii", OperatingCosts.averageSale, a.trades);
     return a;
 };
 
-export interface CostSalesSequent extends VisitorSequent {
-    fixedCosts: number;
-    variableCosts: number;
-    netSales: number;
-    vatSales: number;
-    totalCosts: number;
-    profit: number;
-    cashflow: number;
-    cumVat: number;
-    cumProfit: number;
-}
 
 const monthlyVisitorBias = {
-    '0': .8,
-    '1': 1,
-    '2': 1.02,  // mar
-    '3': 1.03,
-    '4': 1.04,
-    '5': 1.1,
-    '6': 1.2,   // jul
-    '7': 1.1,
-    '8': 1.1,   // sep
-    '9': 1,
+    '1': .8,
+    '2': 1,
+    '3': 1.02,  // mar
+    '4': 1.03,
+    '5': 1.04,
+    '6': 1.1,
+    '7': 1.2,   // jul
+    '8': 1.1,
+    '9': 1.1,   // sep
     '10': 1,
-    '11': .7    // dec
+    '11': 1,
+    '12': .7    // dec
 };
 
 const weeklyVisitorBias = {
-    '0': .3, // su
-    '1': .4, // mo
-    '2': .5, // tu
-    '3': 1,  // w
-    '4': 1,  // th
-    '5': .9, // f
-    '6': .3, // sa
+    '1': 1, // su
+    '2': .5, // mo
+    '3': .8, // tu
+    '4': 1.2,  // w
+    '5': 1.5,  // th
+    '6': 1.5, // f
+    '7': 1.8, // sa
 };
 
+const OperatingCosts = {
+    staffPerDay: 200,
+    tradesBase: 210,
+    rent: 30000 / 12,
+    averageSale: 2.2,
+    serviceCharge: 3000 // per quarter
+};
 
 export class ForecastModelBasic {
 
@@ -383,7 +424,7 @@ export class ForecastModelBasic {
      */
 
     static computeVisitors(baseVisitorNo: number, monthno: number, isoWeekday: 1 | 2 | 3 | 4 | 5 | 6 | 7) {
-        return baseVisitorNo * weeklyVisitorBias[isoWeekday] * monthlyVisitorBias[monthno];
+        return (baseVisitorNo * weeklyVisitorBias[isoWeekday] * monthlyVisitorBias[monthno]).toPrecision(2);
     }
 
     static callZip() {
@@ -394,7 +435,7 @@ export class ForecastModelBasic {
             .map((a: DateSequent) => VisitorSequentFactory(a, 100))
             .map(a => computeFixedCosts(a))
             .map(a => computeVariableCosts(a))
-            .map(a => computeSales(a))
+            .map(a => computeNetSales(a))
             .subscribe(console.log);
 
         console.log('day', moment().get('day'));
@@ -406,7 +447,9 @@ export class ForecastModelBasic {
             .map((a: DateSequent) => VisitorSequentFactory(a, 100))
             .map(a => computeFixedCosts(a))
             .map(a => computeVariableCosts(a))
-            .map(a => computeSales(a))
+            .map(a => computeFixedCosts(a))
+            .map(a => computeNetSales(a))
+            .map(a => computeTotalCosts(a))
             .scan(computeCumTotals);
     }
 

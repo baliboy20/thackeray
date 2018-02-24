@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { WhatifComponent } from './whatif.component';
+import {CellOfTableComponent, HeaderOfTableComponent, WhatifComponent} from './whatif.component';
 import {RouterModule, Routes} from '@angular/router';
 import {SettingsComponent} from '../settings/settings.component';
 import {MaterialsModule} from '../../materials/materials.module';
@@ -17,7 +17,10 @@ const route: Routes = [
       FormsModule,
       MaterialsModule,
   ],
-  declarations: [WhatifComponent],
-    providers: [VisitorService]
+  declarations: [WhatifComponent,
+      CellOfTableComponent,
+      HeaderOfTableComponent],
+    providers: [VisitorService],
+    exports: []
 })
 export class WhatifModule { }

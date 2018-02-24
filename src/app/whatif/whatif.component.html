@@ -5,20 +5,18 @@
     </mat-toolbar>
 </div>
 <mat-sidenav-container>
-    <mat-sidenav mode="over" #sidenav opened="toggle()">
+    <mat-sidenav mode="over" #sidenav opened="toggle()" opened="false">
         <mat-tab-group>
             <mat-tab label="model inputs">
                 <mat-card>
                     <form novalidate #fm="ngForm">
-                        <br>
-                        <button mat-raised-button color="primary" (click)="onRecompute()">COMPUTE</button>
-                        <br>
+
                         <mat-form-field>
                             <input matInput
                                    #pickFrom
                                    value="2/5/2018"
                                    [matDatepicker]="pickerFr"
-                                   placeholder="Choose a date"  >
+                                   placeholder="Choose a date">
                             <mat-datepicker-toggle matSuffix [for]="pickerFr"></mat-datepicker-toggle>
                             <mat-datepicker #pickerFr></mat-datepicker>
                         </mat-form-field>
@@ -27,10 +25,13 @@
                             <input matInput
                                    #pickTo
                                    value="2/15/2018"
-                                   [matDatepicker]="pickerTo" placeholder="Choose a date" >
+                                   [matDatepicker]="pickerTo" placeholder="Choose a date">
                             <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
                             <mat-datepicker #pickerTo></mat-datepicker>
                         </mat-form-field>
+                        <br>
+                        <button mat-raised-button color="primary" (click)="onRecompute()">COMPUTE</button>
+                        <br>
                     </form>
 
                 </mat-card>
@@ -38,18 +39,67 @@
             <mat-tab label="layout view"></mat-tab>
         </mat-tab-group>
     </mat-sidenav>
-<mat-card>
-    <table>
-        <tr><td>a table here</td></tr>
-        <ng-container *ngFor="let item of data$ | async">
-            <div class="table">
-                <div class="tbl-col">
-                    <div class="tbl-cell"></div>
-{{item.}}
-                </div>
-            </div>
-            <td>{{item|json}}</td> <td>{{item|json}}</td>
-        </ng-container>
-    </table>
-</mat-card>
+    <div style="background-color: lightblue; height: 50vh">
+
+        <table>
+            <tr>
+                <td class="tble-header" >
+
+                    <table>
+                        <app-hedr [value]="'Dates'"></app-hedr>
+                        <app-cell [value]="'Trades'"></app-cell>
+                        <app-cell [value]="'Fixed Costs'"></app-cell>
+                        <app-cell [value]="'Variable Costs'"></app-cell>
+                        <app-cell [value]="'Total Costs'"></app-cell>
+                        <!--<app-cell [value]="'Total Costs'"></app-cell>-->
+                        <tr><td><hr></td></tr>
+                        <app-cell [value]="'Net Sales'"></app-cell>
+                        <app-cell [value]="'Vat'"></app-cell>
+                        <tr><td><hr></td></tr>
+                        <app-cell [value]="'P/l'"></app-cell>
+                        <tr><td><hr></td></tr>
+                        <app-cell [value]="'Cum P/l'"></app-cell>
+                    </table>
+                </td>
+
+                <!--fc.cumVat = 0;-->
+                <!--fc.cumProfit = 0;-->
+                <!--fc.cashflow = 0;-->
+                <!--fc.cumCosts = 0;-->
+
+                <td class="tble-header" *ngFor="let item of data$ | async let index =index">
+
+                    <table>
+                        <app-hedr [value]="item.date"></app-hedr>
+                        <app-cell [value]="item.trades"></app-cell>
+                        <app-cell [value]="item.fixedCosts"></app-cell>
+                        <app-cell [value]="item.variableCosts"></app-cell>
+                        <app-cell [value]="item.totalCosts"></app-cell>
+                        <tr><td><hr></td></tr>
+                        <app-cell [value]="item.netSales"></app-cell>
+                        <app-cell [value]="item.vatOnSales"></app-cell>
+                        <tr><td><hr></td></tr>
+                        <app-cell [value]="item.profit"></app-cell>
+                        <tr><td><hr></td></tr>
+                        <app-cell [value]="item.cumProfit"></app-cell>
+
+                    </table>
+                </td>
+            </tr>
+
+        </table>
+    </div>
 </mat-sidenav-container>
+
+
+<!--
+fixedCosts: number;
+    variableCosts: number;
+    netSales: number;
+    vatSales: number;
+    totalCosts: number;
+    profit: number;
+    cashflow: number;
+    cumVat: number;
+    cumProfit: number;
+-->

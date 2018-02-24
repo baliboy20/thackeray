@@ -19,15 +19,34 @@ mat-sidenav-container {
   height: calc(100vh);
 }
 
+.cell {
+  padding:2px;
+  //background-color: rgba(black,.05);
+  overflow: hidden;
+  text-align: end;
+  //border: 1px solid lightgreen;
+  width: 100%;
+}
+table {
+
+}
+
+.valueformat{
+  color:purple;
+}
+
+.headerformat{
+  color: green;
+  min-width: 95px;
+  font-size: 12px;
+}
 
 .table {
   display: flex;
-  flex-flow: row nowrap;
+  flex: 1 1 100%;
+  width: 1000px;
+  flex-flow: column nowrap;
   background-color: crimson;
 }
 
-.tbl-col {
-  display:flex ;
-  flex-flow: column nowrap;
-  background-color: greenyellow;
-}
+
