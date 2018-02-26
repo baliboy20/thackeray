@@ -49,21 +49,19 @@ export class VisitorService {
     constructor() {
     }
 
-    getForecast(from1: string, to: string, interval1: PeriodOfString, forecastmodel?: any) {
+    getForecast(from1: string, to: string, interval1: string, forecastmodel?: any) {
         return ForecastModelBasic.baseModel(from1, to, interval1);
     }
 
-    getForecastGrouped(from1: string, to: string, interval1: PeriodOfString, forecastmodel?: any) {
+    getForecastGrouped(from1: string, to: string, interval1: string, forecastmodel?: any) {
         return ForecastModelBasic.baseModelGrouped(from1, to, interval1);
     }
 
 }
 
-type PeriodOfString = 'day' | ' week' | 'month' | 'quarter' | 'biannual' | 'year';
-
 interface Dayts {
     date: string;
-    dateBucket: PeriodOfString;
+    dateBucket: string;
     dayNo: number;
 }
 
@@ -111,7 +109,6 @@ const VisitorSequentFactory: (ds: DateSequent, tradeBase) => VisitorSequent = (d
 
 const computeVisitors = (month, isoWeekday, trades) => {
     const tr = +(trades * monthlyVisitorBias[month] * weeklyVisitorBias[isoWeekday]);
-    //console.log('tr', trades , monthlyVisitorBias[month] , weeklyVisitorBias[isoWeekday]);
     return tr;
 };
 
@@ -230,25 +227,25 @@ export class ForecastModelBasic {
 
     static dateMap: Map<string, any[]> = new Map();
 
-    static call() {
-        const source$ = range(0, 10);
-        source$.pipe(
-            filter(x => x % 2 === 0),
-            map(x => x + x),
-            scan((acc, x) => acc + x, 0)
-        )
-            .subscribe(x => console.log(x + 'dd'));
-
-        const scan1 = (acc, idx) => acc + idx;
-        const merge = combineLatest(obs => Observable.range(1, 2)
-            .map(a => a + ':' + obs));
-
-
-        Observable.range(1, 2).pipe(merge).subscribe(a => {
-            // a.subscribe(console.log);
-            // console.log('hello there', a);
-        });
-    }
+    // static call() {
+    //     const source$ = range(0, 10);
+    //     source$.pipe(
+    //         filter(x => x % 2 === 0),
+    //         map(x => x + x),
+    //         scan((acc, x) => acc + x, 0)
+    //     )
+    //         .subscribe(x => console.log(x + 'dd'));
+    //
+    //     const scan1 = (acc, idx) => acc + idx;
+    //     const merge = combineLatest(obs => Observable.range(1, 2)
+    //         .map(a => a + ':' + obs));
+    //
+    //
+    //     Observable.range(1, 2).pipe(merge).subscribe(a => {
+    //         // a.subscribe(console.log);
+    //         // console.log('hello there', a);
+    //     });
+    // }
 
     static costs(p1?: Date, p2?: Date) {
         const s$ = interval();
@@ -274,7 +271,7 @@ export class ForecastModelBasic {
         return PIPE;
     }
 
-    static costsByPeriod(periodType: PeriodOfString, start: string, finish: string) {
+    static costsByPeriod(periodType: string, start: string, finish: string) {
         const increr = scan((acc, curr) => {
             acc.total *= 1.01;
             acc.date = curr.date;
@@ -335,13 +332,13 @@ export class ForecastModelBasic {
     }
 
     static fromDateObservable(from1: string = '01/01/2018', to: string = '04/01/2018',
-                              gap: PeriodOfString = 'day'): Observable<DateSequent> {
+                              gap: string = 'day'): Observable<DateSequent> {
         return Observable.create((observer: Observer<Dayts>) => {
                 let d = 0;
                 let moDate = moment(from1);
 
                 while (moDate.isSameOrBefore(to)) {
-                    moDate = moment(from1).add(d, 'd');
+
                     const v: Dayts = {
                         dateBucket: gap,
                         dayNo: d,
@@ -352,6 +349,7 @@ export class ForecastModelBasic {
                         isoWeekday: moment(moDate).isoWeekday(),
                         date: moDate.format('DD-MMM-YYYY'),
                     } as Dayts;
+                    moDate = moment(from1).add(d, 'd');
                     observer.next(v);
                     d++;
                     if (d > 2140) {
@@ -368,11 +366,11 @@ export class ForecastModelBasic {
      * Visitor numbers have two trend annual footfall,
      * @param {string} from1
      * @param {string} to
-     * @param {PeriodOfString} bucket
+     * @param {string} bucket
      * @returns {Observable<number>}
      */
     static observableVistorGenerator(from1: string = '01/01/2018', to: string = '04/01/2018',
-                                     bucket: PeriodOfString = 'day'): Observable<number> {
+                                     bucket: string = 'day'): Observable<number> {
         return Observable.create((observer: Observer<Dayts>) => {
                 let frm = from1;
                 let dayno = 0;
@@ -478,8 +476,9 @@ export class ForecastModelBasic {
         console.log('day', moment().get('day'));
     }
 
-    static baseModel(from1: string = '01/01/2018', to: string = '04/01/2018',
-                     gap: PeriodOfString = 'day'): Observable<CostSalesSequent> {
+    static baseModel(from1: string = '02/01/2018', to: string = '26/01/2018',
+                     gap: string = 'day'): Observable<CostSalesSequent> {
+        console.log('baseModel s', from1, to, gap);
         return this.fromDateObservable(from1, to, gap)
             .map((a: DateSequent) => VisitorSequentFactory(a, 100))
             .map(a => computeFixedCosts(a))
@@ -490,9 +489,9 @@ export class ForecastModelBasic {
             .scan(computeCumTotals);
     }
 
-
     static baseModelGrouped(from1: string = '01/01/2018', to: string = '04/01/2018',
-                            gap: PeriodOfString = 'day'): Observable<any> {
+                            gap: string = 'day'): Observable<any> {
+        console.log('baseModelGrouped', from1, to, gap);
         return this.fromDateObservable(from1, to, gap)
             .map((a: DateSequent) => VisitorSequentFactory(a, 100))
             .map(a => computeFixedCosts(a))
@@ -502,24 +501,37 @@ export class ForecastModelBasic {
             .map(a => computeTotalCosts(a))
             .scan(computeCumTotals)
             // .groupBy(a => moment(a).week())
-            .groupBy(a => computeGroupOnPeriod(a, 'year'))
-            .flatMap(a => from(a).pipe(computeGroupedValues(a.key)))
-            .do(a => console.log(a));
-
+            .groupBy(a => computeGroupOnPeriod(a, gap))
+            .flatMap(a => from(a).pipe(computeGroupedValues(a.key)));
+        // .do(a => console.log(a));
     }
-
 }
 
 const computeGroupOnPeriod = (a: any, b: string) => {
+    let retval;
     if (b === 'year') {
-        return moment(a.date).format('YYYY');
+        retval = moment(a.date).format('YYYY');
     } else if (b === 'day') {
-        return a.dayNo;
+        retval = a.dayNo;
     } else if (b === 'month') {
-        return moment(a.date).format('MMMYY');
+        retval = moment(a.date).format('MMMYY');
     } else if (b === 'quarter') {
-        return a.qtr;
+        retval = a.qtr;
     } else if (b === 'week') {
-        return moment(a).week();
+        retval = a.weekNo;
+    } else {
+        throw error('Group period is not set');
     }
+    console.log('the computer group period is', retval, a);
+    return retval;
 };
+
+/***
+ * month: moment(moDate).month() + 1,
+ year: moment(moDate).year(),
+ qtr: moment(moDate).quarter(),
+ weekNo: moment(moDate).isoWeek(),
+ isoWeekday: moment(moDate).isoWeekday(),
+ date: moDate.format('DD-MMM-YYYY'),
+ */
+

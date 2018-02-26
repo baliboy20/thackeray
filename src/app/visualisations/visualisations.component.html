@@ -1,26 +1,70 @@
-<div style="position:relative;top:0px;height:66px; background-color: lightblue">hello</div>
-VISUALISATIONS  jsdfl
+<div style="position:relative;top:0px;height:66px; background-color: lightblue"></div>
+<form action="" #fm3="ngForm">
+    VISUALISATION
+    <br>
+   <mat-card>
+           <mat-radio-group #rads (change)="rgChanged($event)">
+               <!--<mat-radio-button-->
+                       <!--[value]="groupby[0]"-->
+                       <!--#weekly-->
+                       <!--ngDefaultControl-->
+                       <!--[name]="weekly">{{groupby[0]}}-->
+               <!--</mat-radio-button>-->
+               <mat-radio-button
+                       [value]="groupby[1]"
+                       #monthly
+                       ngDefaultControl
+                       [name]="weekly">{{groupby[1]}}
+               </mat-radio-button>
+               <mat-radio-button
+                       [value]="groupby[2]"
+                       #monthly
+                       ngDefaultControl
+                       [name]="weekly">{{groupby[2]}}
+               </mat-radio-button>
+               <mat-radio-button
+                       [value]="groupby[3]"
+                       #monthly
+                       ngDefaultControl
+                       [name]="quarterly">{{groupby[3]}}
+               </mat-radio-button>
+               <mat-radio-button
+                       [value]="groupby[0]"
+                       #monthly
+                       ngDefaultControl
+                       [name]="yearly">{{groupby[0]}}
+               </mat-radio-button>
+               <!--<mat-radio-button value="2">Option 2</mat-radio-button>-->
+           </mat-radio-group>
+       <hr>
+       {{_from}}
+       <hr>
+       <mat-form-field>
+           <input matInput
+                  [ngModel]="_from"
+                  name="from"
+                  [matDatepicker]="pickerFrom"
+                  placeholder="Choose date to"
+                  (dateChange)="onDateChanged('from',$event)">
+           <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+           <mat-datepicker #pickerFrom></mat-datepicker>
+       </mat-form-field>
+        <div style="display: inline-block;padding:13px">To</div>
+       <mat-form-field>
+           <input matInput
+                  [ngModel]="_to"
+                  name="to"
+                  [matDatepicker]="pickerTo"
+                  placeholder="Choose date from"
+                  (dateChange)="onDateChanged('to', $event)">
+           <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+           <mat-datepicker #pickerTo></mat-datepicker>
+       </mat-form-field>
+
+   </mat-card>
+</form>
 <div class="table-container">
 
-    <div class="table-item">
-        <div class="table-col">Date</div>
-        <div class="table-col">Fixed Costs</div>
-        <div class="table-col">Variable Costs</div>
-        <div class="table-col"><hr></div>
-        <div class="table-col">TotalCosts</div>
-        <div class="table-col"> Trades</div>
-        <div class="table-col">Net Sales</div>
-    </div>
-    <div class="table-item" *ngFor="let it of data$">
-        <ng-container *ngFor="let fldnam of flds">
 
-            <ng-container *ngIf="fldnam =='breakline'">
-                <div class="table-col"><hr></div>
-            </ng-container>
-
-            <div class="table-col">{{it[fldnam]|numFmt}}</div>
-        </ng-container>
-
-
-    </div>
+    <app-cf-cum-periodic [data]="data$"></app-cf-cum-periodic>
 </div>

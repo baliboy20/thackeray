@@ -13,19 +13,22 @@
 
                         <mat-form-field>
                             <input matInput
-                                   #pickFrom
-                                   value="2/5/2018"
-                                   [matDatepicker]="pickerFr"
-                                   placeholder="Choose a date">
-                            <mat-datepicker-toggle matSuffix [for]="pickerFr"></mat-datepicker-toggle>
-                            <mat-datepicker #pickerFr></mat-datepicker>
+                                   [ngModel]="_from"
+                                   name="from"
+                                   [matDatepicker]="pickerFrom"
+                                   placeholder="Choose date to"
+                                   (dateChange)="onDateChanged('from',$event)">
+                            <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+                            <mat-datepicker #pickerFrom></mat-datepicker>
                         </mat-form-field>
-                        <br>
+                        <div style="display: inline-block;padding:13px">To</div>
                         <mat-form-field>
                             <input matInput
-                                   #pickTo
-                                   value="2/15/2018"
-                                   [matDatepicker]="pickerTo" placeholder="Choose a date">
+                                   [ngModel]="_to"
+                                   name="to"
+                                   [matDatepicker]="pickerTo"
+                                   placeholder="Choose date from"
+                                   (dateChange)="onDateChanged('to', $event)">
                             <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
                             <mat-datepicker #pickerTo></mat-datepicker>
                         </mat-form-field>
@@ -42,45 +45,8 @@
     <div style="background-color: lightblue; height: 50vh">
 
         <div class="table-container">
+            <app-cf-daily [data]="data$"></app-cf-daily>
 
-            <div class="table-item">
-                <div class="table-col">Date</div>
-                <div class="table-col"> Transactions</div>
-                <div class="table-col">Fixed Costs</div>
-                <div class="table-col">Variable Costs</div>
-                <div class="table-col">TotalCosts</div>
-                <div class="table-col"> <hr> </div>
-                <div class="table-col">Net Sales</div>
-                <div class="table-col"><hr></div>
-                <div class="table-col">Profit</div>
-
-                <div class="table-col"><hr></div>
-                <div class="table-col">cum. Profit</div>
-                <div class="table-col">cum. Total Costs</div>
-                <div class="table-col"> <br></div>
-                <div class="table-col">Vat</div>
-                <div class="table-col">cum. Vat</div>
-            </div>
-            <div class="table-item" *ngFor="let it of data$|async">
-                <div class="table-col">{{it[fld]}}</div>
-                <div class="table-col"> {{it.trades|numFmt}}</div>
-                <div class="table-col">{{it.fixedCosts |numFmt}}</div>
-                <div class="table-col">{{it.variableCosts|numFmt}}</div>
-                <div class="table-col">{{it.totalCosts|numFmt}}</div>
-                <div class="table-col"> <hr></div>
-                <div class="table-col">{{it.netSales|numFmt}}</div>
-                <div class="table-col"> <hr></div>
-                <div class="table-col">{{it.profit|numFmt}}</div>
-
-                <div class="table-col"> <hr></div>
-                <div class="table-col">{{it.cumProfit|numFmt}}</div>
-
-                <div class="table-col">{{it.cumTotalCosts|numFmt}}</div>
-                <div class="table-col"> <br></div>
-                <div class="table-col">{{it.vatOnSales|numFmt}}</div>
-                <div class="table-col">{{it.cumVat|numFmt}}</div>
-                <!--<div class="table-col">{{it.v}}</div>-->
-            </div>
         </div>
     </div>
 

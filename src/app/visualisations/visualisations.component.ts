@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {CostSalesSequent, VisitorService} from '../generators/visitor/visitor.service';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
@@ -7,7 +7,7 @@ import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/debounce';
 import 'rxjs/operators/windowTime';
 import 'rxjs/add/observable/interval';
-import {windowTime} from 'rxjs/operators';
+import {MatRadioGroup} from '@angular/material';
 
 @Component({
     selector: 'app-visualisations',
@@ -16,8 +16,9 @@ import {windowTime} from 'rxjs/operators';
 })
 export class VisualisationsComponent implements OnInit {
 
-    // data$: ReplaySubject<any[]> = new ReplaySubject();
+    @ViewChild(MatRadioGroup) rg: ElementRef;
     data$: any[] = [];
+
     flds = [
         'date',
         'trades',
@@ -27,27 +28,42 @@ export class VisualisationsComponent implements OnInit {
         'netSales',
     ];
 
+    groupby = ['year', 'week', 'month', 'quarter'];
+    selectedGroupBy: 'week';
+    _from = new Date('02/13/2018');
+    _to = new Date('08/13/2018');
+
     constructor(private  service: VisitorService) {
     }
 
+    rgChanged(event) {
+        console.log('event...', event);
+        this.selectedGroupBy = event.value;
+        this.runOrRerun();
+    }
 
     ngOnInit() {
-        // this.data$.subscribe(console.log);
+    }
 
-
-        // const rang = Observable.range(1, 40)
-        //     .map(a => ({k: a, v: `Dorrito${a}`}));
-        //  rang
-        //      .toArray()
-        //      .subscribe(a => this.data$.next(a));
-
-
-        const obs = this.service.getForecastGrouped('2/13/2018',
-            '12/18/2018',
-            'month',
+    runOrRerun() {
+        const obs = this.service.getForecastGrouped(this._from.toISOString(),
+            this._to.toISOString(),
+            this.selectedGroupBy,
             null);
 
-        obs.subscribe(b => this.data$.push(b));
+        obs.do(() => this.data$ = []).toArray()
+    .subscribe(b => this.data$ = b, (err) => console.log, () => console.log('completed') );
+
+
+    }
+
+    onDateChanged(to, event) {
+        if (to === 'from') {
+            this._from = event.target.value;
+        } else {
+           this._to = event.target.value;
+        }
+        this.runOrRerun();
     }
 
 }

@@ -7,6 +7,7 @@ import {MaterialsModule} from '../../materials/materials.module';
 import {VisitorService} from '../generators/visitor/visitor.service';
 import {FormsModule} from '@angular/forms';
 import { NumFmtPipe } from './num-fmt.pipe';
+import {ComponentsModule} from '../components/components.module';
 const route: Routes = [
     {path: 'whatif', component: WhatifComponent}
 ];
@@ -17,6 +18,7 @@ const route: Routes = [
       RouterModule.forChild(route),
       FormsModule,
       MaterialsModule,
+      ComponentsModule,
   ],
   declarations: [WhatifComponent,
       CellOfTableComponent,
