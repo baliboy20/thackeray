@@ -7,7 +7,7 @@ import {ReplaySubject} from 'rxjs/ReplaySubject';
 @Component({
     selector: 'app-cell',
     styleUrls: ['./whatif.component.scss'],
-    template: `<table><tr><td class="cell"><span class="valueformat">{{value}}</span></td></tr></table>`
+    template: `<table><tr><td class="cell"><span class="valueformat">{{value | numFmt}}</span></td></tr></table>`
 })
 export class CellOfTableComponent {
     @Input('value') value: any;
@@ -37,14 +37,14 @@ export class WhatifComponent implements OnInit {
     data$: ReplaySubject<CostSalesSequent[]> = new ReplaySubject();
     pickerFr = '01/01/2018';
     pickerTo = '12/05/2018';
-
+fld = 'date';
     constructor(private  service: VisitorService) {
     }
 
     ngOnInit() {
         this.data$.subscribe(console.log);
         this.service.getForecast('2/13/2018',
-            '2/18/2018',
+            '12/18/2018',
             'day',
             null)
             .toArray()

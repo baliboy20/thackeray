@@ -41,54 +41,50 @@
     </mat-sidenav>
     <div style="background-color: lightblue; height: 50vh">
 
-        <table>
-            <tr>
-                <td class="tble-header" >
+        <div class="table-container">
 
-                    <table>
-                        <app-hedr [value]="'Dates'"></app-hedr>
-                        <app-cell [value]="'Trades'"></app-cell>
-                        <app-cell [value]="'Fixed Costs'"></app-cell>
-                        <app-cell [value]="'Variable Costs'"></app-cell>
-                        <app-cell [value]="'Total Costs'"></app-cell>
-                        <!--<app-cell [value]="'Total Costs'"></app-cell>-->
-                        <tr><td><hr></td></tr>
-                        <app-cell [value]="'Net Sales'"></app-cell>
-                        <app-cell [value]="'Vat'"></app-cell>
-                        <tr><td><hr></td></tr>
-                        <app-cell [value]="'P/l'"></app-cell>
-                        <tr><td><hr></td></tr>
-                        <app-cell [value]="'Cum P/l'"></app-cell>
-                    </table>
-                </td>
+            <div class="table-item">
+                <div class="table-col">Date</div>
+                <div class="table-col"> Transactions</div>
+                <div class="table-col">Fixed Costs</div>
+                <div class="table-col">Variable Costs</div>
+                <div class="table-col">TotalCosts</div>
+                <div class="table-col"> <hr> </div>
+                <div class="table-col">Net Sales</div>
+                <div class="table-col"><hr></div>
+                <div class="table-col">Profit</div>
 
-                <!--fc.cumVat = 0;-->
-                <!--fc.cumProfit = 0;-->
-                <!--fc.cashflow = 0;-->
-                <!--fc.cumCosts = 0;-->
+                <div class="table-col"><hr></div>
+                <div class="table-col">cum. Profit</div>
+                <div class="table-col">cum. Total Costs</div>
+                <div class="table-col"> <br></div>
+                <div class="table-col">Vat</div>
+                <div class="table-col">cum. Vat</div>
+            </div>
+            <div class="table-item" *ngFor="let it of data$|async">
+                <div class="table-col">{{it[fld]}}</div>
+                <div class="table-col"> {{it.trades|numFmt}}</div>
+                <div class="table-col">{{it.fixedCosts |numFmt}}</div>
+                <div class="table-col">{{it.variableCosts|numFmt}}</div>
+                <div class="table-col">{{it.totalCosts|numFmt}}</div>
+                <div class="table-col"> <hr></div>
+                <div class="table-col">{{it.netSales|numFmt}}</div>
+                <div class="table-col"> <hr></div>
+                <div class="table-col">{{it.profit|numFmt}}</div>
 
-                <td class="tble-header" *ngFor="let item of data$ | async let index =index">
+                <div class="table-col"> <hr></div>
+                <div class="table-col">{{it.cumProfit|numFmt}}</div>
 
-                    <table>
-                        <app-hedr [value]="item.date"></app-hedr>
-                        <app-cell [value]="item.trades"></app-cell>
-                        <app-cell [value]="item.fixedCosts"></app-cell>
-                        <app-cell [value]="item.variableCosts"></app-cell>
-                        <app-cell [value]="item.totalCosts"></app-cell>
-                        <tr><td><hr></td></tr>
-                        <app-cell [value]="item.netSales"></app-cell>
-                        <app-cell [value]="item.vatOnSales"></app-cell>
-                        <tr><td><hr></td></tr>
-                        <app-cell [value]="item.profit"></app-cell>
-                        <tr><td><hr></td></tr>
-                        <app-cell [value]="item.cumProfit"></app-cell>
-
-                    </table>
-                </td>
-            </tr>
-
-        </table>
+                <div class="table-col">{{it.cumTotalCosts|numFmt}}</div>
+                <div class="table-col"> <br></div>
+                <div class="table-col">{{it.vatOnSales|numFmt}}</div>
+                <div class="table-col">{{it.cumVat|numFmt}}</div>
+                <!--<div class="table-col">{{it.v}}</div>-->
+            </div>
+        </div>
     </div>
+
+
 </mat-sidenav-container>
 
 

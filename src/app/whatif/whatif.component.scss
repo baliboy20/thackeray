@@ -19,34 +19,30 @@ mat-sidenav-container {
   height: calc(100vh);
 }
 
-.cell {
-  padding:2px;
-  //background-color: rgba(black,.05);
-  overflow: hidden;
-  text-align: end;
-  //border: 1px solid lightgreen;
-  width: 100%;
-}
-table {
 
-}
-
-.valueformat{
-  color:purple;
-}
-
-.headerformat{
-  color: green;
-  min-width: 95px;
-  font-size: 12px;
-}
-
-.table {
+// new table formata
+.table-container{
   display: flex;
-  flex: 1 1 100%;
-  width: 1000px;
-  flex-flow: column nowrap;
-  background-color: crimson;
+  flex-flow: row nowrap;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+}
+.table-item {
+  justify-content: center;
+  background-color: lightblue;
+}
+.table-col {
+  padding: 2px;
+  min-width: 120px;
+  //background-color: silver;
+   border: 1px solid darken(lightblue,1%);
+  margin:2px;
+  text-align: center;
+}
+
+.table-head {
+
 }
 
 

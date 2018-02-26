@@ -6,6 +6,7 @@ import {SettingsComponent} from '../settings/settings.component';
 import {MaterialsModule} from '../../materials/materials.module';
 import {VisitorService} from '../generators/visitor/visitor.service';
 import {FormsModule} from '@angular/forms';
+import { NumFmtPipe } from './num-fmt.pipe';
 const route: Routes = [
     {path: 'whatif', component: WhatifComponent}
 ];
@@ -19,7 +20,8 @@ const route: Routes = [
   ],
   declarations: [WhatifComponent,
       CellOfTableComponent,
-      HeaderOfTableComponent],
+      HeaderOfTableComponent,
+      NumFmtPipe],
     providers: [VisitorService],
     exports: []
 })

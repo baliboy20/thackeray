@@ -53,6 +53,10 @@ export class VisitorService {
         return ForecastModelBasic.baseModel(from1, to, interval1);
     }
 
+    getForecastGrouped(from1: string, to: string, interval1: PeriodOfString, forecastmodel?: any) {
+        return ForecastModelBasic.baseModelGrouped(from1, to, interval1);
+    }
+
 }
 
 type PeriodOfString = 'day' | ' week' | 'month' | 'quarter' | 'biannual' | 'year';
@@ -74,6 +78,7 @@ export interface CostSalesSequent extends VisitorSequent {
     cumVat: number;
     cumProfit: number;
     cumCosts: number;
+    cumTotalCosts: number;
 }
 
 interface DateSequent {
@@ -140,10 +145,21 @@ const computeTotalCosts: (a: CostSalesSequent) => CostSalesSequent = (a: CostSal
 };
 const computeCumTotals: (a: CostSalesSequent, b: CostSalesSequent, i: number) => CostSalesSequent =
     (prev: CostSalesSequent, curr: CostSalesSequent, idx: number) => {
-    prev.cumProfit = (idx === 0) ? prev.profit : prev.cumProfit;
-        curr.cumVat += +(prev.vatOnSales).toFixed(2);
-        curr.cumProfit = curr.profit + prev.cumProfit; // +(curr.profit).toFixed(4);
-        curr.cumCosts = +(curr.totalCosts + prev.cumCosts).toFixed(2);
+
+        if (idx === 0) {
+            prev.cumProfit = prev.profit;
+            curr.cumProfit = prev.profit + curr.profit;
+            prev.cumVat = prev.vatOnSales;
+            curr.cumVat = prev.vatOnSales + curr.vatOnSales;
+            curr.cumTotalCosts = curr.totalCosts;
+            prev.cumTotalCosts = prev.totalCosts;
+            curr.cumTotalCosts = prev.cumTotalCosts + curr.totalCosts;
+            console.log('cum pr', curr.cumProfit);
+        } else {
+            curr.cumProfit = prev.cumProfit + curr.profit;
+            curr.cumVat = prev.cumVat + curr.vatOnSales;
+            curr.cumTotalCosts = prev.cumTotalCosts + curr.totalCosts;
+        }
         return curr;
     };
 const computeNetSales: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
@@ -155,6 +171,27 @@ const computeNetSales: (a: CostSalesSequent) => CostSalesSequent = (a: CostSales
     return a;
 };
 
+// Grouped computes
+const computeGroupedValues = (key) => {
+    return reduce((acc: CostSalesSequent, curr: CostSalesSequent, idx) => {
+        if (idx === 0) {
+            acc.trades = 0;
+            acc.profit = 0;
+            acc.vatOnSales = 0;
+            acc.variableCosts = 0;
+            acc.vatOnSales = 0;
+            acc.netSales = 0;
+        } else {
+            acc.trades += curr.trades;
+            acc.profit += curr.profit;
+            acc.vatOnSales += curr.vatOnSales;
+            acc.variableCosts += curr.variableCosts;
+            acc.netSales += curr.netSales;
+        }
+        acc.date = key;
+        return acc;
+    }, {} as CostSalesSequent);
+};
 
 const monthlyVisitorBias = {
     '1': .8,
@@ -453,4 +490,36 @@ export class ForecastModelBasic {
             .scan(computeCumTotals);
     }
 
+
+    static baseModelGrouped(from1: string = '01/01/2018', to: string = '04/01/2018',
+                            gap: PeriodOfString = 'day'): Observable<any> {
+        return this.fromDateObservable(from1, to, gap)
+            .map((a: DateSequent) => VisitorSequentFactory(a, 100))
+            .map(a => computeFixedCosts(a))
+            .map(a => computeVariableCosts(a))
+            .map(a => computeFixedCosts(a))
+            .map(a => computeNetSales(a))
+            .map(a => computeTotalCosts(a))
+            .scan(computeCumTotals)
+            // .groupBy(a => moment(a).week())
+            .groupBy(a => computeGroupOnPeriod(a, 'year'))
+            .flatMap(a => from(a).pipe(computeGroupedValues(a.key)))
+            .do(a => console.log(a));
+
+    }
+
 }
+
+const computeGroupOnPeriod = (a: any, b: string) => {
+    if (b === 'year') {
+        return moment(a.date).format('YYYY');
+    } else if (b === 'day') {
+        return a.dayNo;
+    } else if (b === 'month') {
+        return moment(a.date).format('MMMYY');
+    } else if (b === 'quarter') {
+        return a.qtr;
+    } else if (b === 'week') {
+        return moment(a).week();
+    }
+};
