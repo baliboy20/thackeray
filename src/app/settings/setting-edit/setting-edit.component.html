@@ -1,0 +1,103 @@
+<div mat-dialog-title>
+    ADD/EDIT
+</div>
+<div mat-dialog-content>
+    <ng-container *ngTemplateOutlet="list; context:{item: assumptions}"></ng-container>
+</div>
+
+<div mat-dialog-actions style="margin-top:40px">
+
+    <button mat-button
+
+            style="margin-right: 20px; color: crimson"
+            (click)="onClose()">
+        CANCEL
+    </button>
+
+    <button mat-raised-button
+            color="primary"
+            [mat-dialog-close]="{mode:editstate, data: assumptions}">
+        OK
+    </button>
+
+
+</div>
+
+<!--
+            LIST TEMPLATE
+-->
+
+<ng-template #list let-it="item">
+    <mat-form-field>
+        <input type="text"
+               matInput
+               [(ngModel)]="it.configName"
+               required
+               name="willli">
+        <mat-hint>Name of this setting config</mat-hint>
+        <mat-error>Required</mat-error>
+    </mat-form-field>
+
+    <h3>{{it.configName}}</h3>
+    <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rent, fldname:'Rent'}"></ng-container>
+    <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rates, fldname:'Rates'}"></ng-container>
+    <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.lease, fldname:'Leasing'}"></ng-container>
+    <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.serviceCharge, fldname:'Services'}"></ng-container>
+
+</ng-template>
+<!--
+            SUB LIST TEMPLATE
+-->
+<ng-template #detailFrom let-ob="sub" let-fname="fldname">
+    <h3>{{fname}}</h3>
+    <form novalidate #fm1="ngForm">
+        <mat-form-field>
+            <input type="text"
+                   matInput
+                   [(ngModel)]="ob.amount"
+                   name="amount">
+            <mat-hint>Amount to be paid</mat-hint>
+        </mat-form-field>
+        <mat-form-field>
+            <input type="text"
+                   matInput
+                   [(ngModel)]="ob.dayDue"
+                   name="datDue">
+            <mat-hint>Payment terms (/days)</mat-hint>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-select
+                    name="ddFrequency"
+                    [(ngModel)]="ob.frequency"
+                    placeholder="Period of reoccurence">
+                <mat-option *ngFor="let period of [{key:'m', value:'month'}, {key:'q', value:'quarter'}]"
+                            [value]="period.key">
+                    {{ period.value }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
+
+</ng-template>
+<!--
+            NEW RECORD TEMPLATE
+-->
+<!--<ng-template #NewSettings let-it="newRec">-->
+
+
+    <!--<span>{{it.configName}}</span>-->
+    <!--<h4>Renta:</h4>-->
+    <!--<div style="background-color: #f6f4ec">-->
+        <!--{{it|json}}-->
+        <!--Amount: <span>{{it.rent.amount}}</span> <br>-->
+        <!--Frequency:<span>{{it.rent.frequency}}</span> <br>-->
+        <!--Pay within: <span>{{it.rent.dayDue}}</span> <br>-->
+    <!--</div>-->
+    <!--<ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rent, fldname:'Rent'}"></ng-container>-->
+    <!--<ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rates, fldname:'Rates'}"></ng-container>-->
+    <!--<ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.lease, fldname:'Leasing'}"></ng-container>-->
+    <!--<ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.serviceCharge, fldname:'Services'}"></ng-container>-->
+
+
+<!--</ng-template>-->
+

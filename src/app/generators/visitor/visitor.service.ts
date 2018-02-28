@@ -42,6 +42,13 @@ export class VisitorService {
         return ForecastModelBasic.baseModelGrouped(from1, to, interval1);
     }
 
+    getAssumptions() {
+        return StoreLocalSettings.retrieve();
+    }
+
+    setAssuptions(assumps: any) {
+
+    }
 }
 
 /**
@@ -102,34 +109,33 @@ const computeVisitors = (month, isoWeekday, trades) => {
 
 // const format2Decimals = (value) => value.toFixed(2);
 export class FixedCostsImpl implements FixedCosts {
-    configName = 'default';
-    serviceCharge: { amount: 300, frequency: 'q', dayDue: 30 };
-    rent = { amount: 300, frequency: 'q', dayDue: 30 };
-    rates = { amount: 300, frequency: 'q', dayDue: 30 };
-    lease = { amount: 300, frequency: 'q', dayDue: 30 };
+    configName = 'defaultSettings';
+    serviceCharge = {amount: 300, frequency: 'q', dayDue: 30};
+    rent = {amount: 300, frequency: 'q', dayDue: 30};
+    rates = {amount: 300, frequency: 'q', dayDue: 30};
+    lease = {amount: 300, frequency: 'q', dayDue: 30};
 }
 
 export interface FixedCosts {
     configName: string;
-    serviceCharge: {
-        amount: number,
-        frequency: string, // due on
-        dayDue: number,
-    };
-    rent: {amount: number, frequency: string, dayDue: number};
-    rates: {amount: number, frequency: string, dayDue: number};
-    lease: {amount: number, frequency: string, dayDue: number};
+    serviceCharge: { amount: number, frequency: string, dayDue: number };
+    rent: { amount: number, frequency: string, dayDue: number };
+    rates: { amount: number, frequency: string, dayDue: number };
+    lease: { amount: number, frequency: string, dayDue: number };
 }
 
 export class StoreLocalSettings {
     static settingName = 'thackSettings';
-    save(value: any[]) {
+
+    static save(value: any[]) {
         const str = JSON.stringify(value);
         window.localStorage.setItem(StoreLocalSettings.settingName, str);
     }
-    retrieve(key) {
+
+    static retrieve() {
         const data = window.localStorage.getItem(StoreLocalSettings.settingName);
-        return JSON.parse(data);
+        const dat = data === null ? new FixedCostsImpl() : JSON.parse(data);
+        return [dat];
     }
 }
 
@@ -380,7 +386,7 @@ const computeGroupOnPeriod = (a: any, b: string) => {
     } else {
         throw error('Group period is not set');
     }
-   // console.log('the computer group period is', retval, a);
+    // console.log('the computer group period is', retval, a);
     return retval;
 };
 
