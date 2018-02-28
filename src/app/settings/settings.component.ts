@@ -12,42 +12,44 @@ import {ScrollStrategy} from '@angular/cdk/overlay';
 })
 export class SettingsComponent implements OnInit {
 
-    // private _tmpl;
-    // @ViewChild('fart', {read: TemplateRef}) set tmpl(value: TemplateRef<any>) {
-    //     console.log('value', value);
-    //     this._tmpl = value;
-    // }
-
     constructor(private service: VisitorService,
                 public pop: MatDialog) {
         console.log('constructing');
     }
 
     assumptions: any;
-    newAssumptions: FixedCostsImpl;
+    newAssumptions: FixedCostsImpl[];
 
     addSettings() {
         const fc = new FixedCostsImpl();
-        fc.configName = 'XXXX setting config';
-        fc.lease = {amount: 0, dayDue: 0, frequency: 'q'};
-        fc.rates = {amount: 0, dayDue: 0, frequency: 'q'};
-        fc.rent = {amount: 0, dayDue: 0, frequency: 'q'};
-        fc.serviceCharge = {amount: 0, dayDue: 0, frequency: 'q'};
+        fc.configName = '==> [New Record] <===';
+            fc.lease = {amount: 200, dayDue: 21, frequency: 'm'};
+            fc.rates = {amount: 5000 / 4, dayDue: 21, frequency: 'q'};
+            fc.rent = {amount: 30000 / 4, dayDue: 21, frequency: 'q'};
+            fc.serviceCharge = {amount: 12000 / 4, dayDue: 21, frequency: 'q'};
 return fc;
     }
 
     ngOnInit() {
+        console.log('assumptes', this.service.getAssumptions());
         this.assumptions = this.service.getAssumptions();
     }
 
     openDialog() {
         const data = {mode: 'NEW_REC', data: this.addSettings()}
          const dialogRef = this.pop.open( SettingEditComponent, {data: data,
-             height: '800px',
+             height: '850px',
              disableClose: true,
              hasBackdrop: true});
          dialogRef.afterClosed()
-             .subscribe((a) => console.log('after cloesed', a));
+             .subscribe((a) => {
+                 if (a === undefined) {
+                     return;
+                 } else if (a.mode === 'NEW_REC') {
+                     this.assumptions.push(a.data);
+                 }
+                 this.service.setAssuptions(this.assumptions);
+             });
     }
 
 }

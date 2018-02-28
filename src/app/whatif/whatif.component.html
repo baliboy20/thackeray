@@ -1,7 +1,11 @@
 <p class="topbar-spacer">sss</p>
 <div class="banner">
     <mat-toolbar>
-        <button (click)="toggle()" mat-raised-button>Settings</button>
+        <button (click)="toggle()" mat-icon-button>
+            <mat-icon *ngIf="!sidenav.opened">more_vert</mat-icon>
+            <mat-icon *ngIf="sidenav.opened">arrow_forward</mat-icon>
+
+        </button>
     </mat-toolbar>
 </div>
 <mat-sidenav-container>

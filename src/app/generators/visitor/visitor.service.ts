@@ -47,6 +47,8 @@ export class VisitorService {
     }
 
     setAssuptions(assumps: any) {
+        console.log('assumptions have been srt', assumps);
+        StoreLocalSettings.save(assumps);
 
     }
 }
@@ -133,9 +135,10 @@ export class StoreLocalSettings {
     }
 
     static retrieve() {
+
         const data = window.localStorage.getItem(StoreLocalSettings.settingName);
         const dat = data === null ? new FixedCostsImpl() : JSON.parse(data);
-        return [dat];
+        return dat;
     }
 }
 

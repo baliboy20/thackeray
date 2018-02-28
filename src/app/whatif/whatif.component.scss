@@ -19,6 +19,11 @@ mat-sidenav-container {
   height: calc(100vh);
 }
 
+mat-toolbar{
+  background-color: darken(crimson,10%);
+  //height: 80px;
+}
+
 
 // new table formata
 .table-container{
@@ -30,13 +35,13 @@ mat-sidenav-container {
 }
 .table-item {
   justify-content: center;
-  background-color: lightblue;
+  //background-color: lightblue;
 }
 .table-col {
   padding: 2px;
   min-width: 120px;
   //background-color: silver;
-   border: 1px solid darken(lightblue,1%);
+  // border: 1px solid darken(lightblue,1%);
   margin:2px;
   text-align: center;
 }

@@ -1,17 +1,11 @@
 <div style="position:relative;top:0px;height:66px; background-color: lightblue"></div>
+<mat-toolbar>Visualisations</mat-toolbar>
 <form action="" #fm3="ngForm">
-    VISUALISATION
-    <br>
+
 <button mat-raised-button (click)="click_download()">download</button>
     <br>
    <mat-card>
            <mat-radio-group #rads (change)="rgChanged($event)">
-               <!--<mat-radio-button-->
-                       <!--[value]="groupby[0]"-->
-                       <!--#weekly-->
-                       <!--ngDefaultControl-->
-                       <!--[name]="weekly">{{groupby[0]}}-->
-               <!--</mat-radio-button>-->
                <mat-radio-button
                        [value]="groupby[1]"
                        #monthly
@@ -38,9 +32,7 @@
                </mat-radio-button>
                <!--<mat-radio-button value="2">Option 2</mat-radio-button>-->
            </mat-radio-group>
-       <hr>
-       {{_from}}
-       <hr>
+       <br>
        <mat-form-field>
            <input matInput
                   [ngModel]="_from"
