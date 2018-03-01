@@ -12,9 +12,9 @@ import {ScrollStrategy} from '@angular/cdk/overlay';
 })
 export class SettingsComponent implements OnInit {
 
+
     constructor(private service: VisitorService,
                 public pop: MatDialog) {
-        console.log('constructing');
     }
 
     assumptions: any;

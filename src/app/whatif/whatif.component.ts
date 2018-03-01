@@ -2,8 +2,9 @@ import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {MatInput, MatSidenav} from '@angular/material';
 import {CostSalesSequent, VisitorService} from '../generators/visitor/visitor.service';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
-import moment = require('moment');
+// import moment = require('moment');
 
+import moment from 'moment/src/moment';
 
 @Component({
     selector: 'app-cell',

@@ -1,9 +1,9 @@
 <p class="topbar-spacer"></p>
 <div class="banner">
     <mat-toolbar>
-        <button (click)="toggle()" mat-icon-button>
+        <button (click)="toggle()" [style.left]="sidenav.opened ? '420px': 0" mat-icon-button>
             <mat-icon *ngIf="!sidenav.opened">more_vert</mat-icon>
-            <mat-icon *ngIf="sidenav.opened">arrow_forward</mat-icon>
+            <mat-icon *ngIf="sidenav.opened">arrow_backward</mat-icon>
 
         </button>
     </mat-toolbar>

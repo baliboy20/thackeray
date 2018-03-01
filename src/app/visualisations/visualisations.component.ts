@@ -8,7 +8,9 @@ import 'rxjs/add/operator/debounce';
 import 'rxjs/operators/scan';
 import 'rxjs/add/observable/interval';
 import {MatRadioGroup} from '@angular/material';
-import moment = require('moment');
+// import moment = require('moment');
+import moment from 'moment/src/moment';
+
 import {Observer} from 'rxjs/Observer';
 
 @Component({
@@ -39,7 +41,6 @@ export class VisualisationsComponent implements OnInit {
     }
 
     rgChanged(event) {
-        console.log('event...', event);
         this.selectedGroupBy = event.value;
         this.runOrRerun();
     }

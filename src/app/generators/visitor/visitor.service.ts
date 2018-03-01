@@ -23,11 +23,14 @@ import {Observer} from 'rxjs/Observer';
 import {error} from 'util';
 import {reduce} from 'rxjs/operators';
 
-// import {let} from 'rxjs/operators';
 
+/**                 ************
+ *                  CLASS VisitorService
+ *
+ */
 @Injectable()
 export class VisitorService {
-
+    public static testval = 144;
     basePeriod = new Date('01/31/2018');
     baseVisitorNo = 100;
 
@@ -53,14 +56,10 @@ export class VisitorService {
     }
 }
 
-/**
+/**                         *********
  *                          INTERFACES
  */
-interface Dayts {
-    date: string;
-    dateBucket: string;
-    dayNo: number;
-}
+
 
 export interface CostSalesSequent extends VisitorSequent {
     fixedCosts: number;
@@ -76,7 +75,7 @@ export interface CostSalesSequent extends VisitorSequent {
     cumTotalCosts: number;
 }
 
-interface DateSequent {
+export interface DateSequent {
     dayNo: number;
     month: number;
     year: number;
@@ -86,11 +85,14 @@ interface DateSequent {
     isoWeekday: string;
 }
 
-interface VisitorSequent extends DateSequent {
+export interface VisitorSequent extends DateSequent {
     trades: number;
     tradeBase: number;
 }
 
+/**                         *********
+ *                          CONSTANTS
+ */
 const VisitorSequentFactory: (ds: DateSequent, tradeBase) => VisitorSequent = (ds: DateSequent) =>
     ({
         dayNo: ds.dayNo,
@@ -125,23 +127,6 @@ export interface FixedCosts {
     rates: { amount: number, frequency: string, dayDue: number };
     lease: { amount: number, frequency: string, dayDue: number };
 }
-
-export class StoreLocalSettings {
-    static settingName = 'thackSettings';
-
-    static save(value: any[]) {
-        const str = JSON.stringify(value);
-        window.localStorage.setItem(StoreLocalSettings.settingName, str);
-    }
-
-    static retrieve() {
-
-        const data = window.localStorage.getItem(StoreLocalSettings.settingName);
-        const dat = data === null ? new FixedCostsImpl() : JSON.parse(data);
-        return dat;
-    }
-}
-
 
 const computeFixedCosts: (arg: VisitorSequent) => CostSalesSequent = (arg: VisitorSequent) => {
     const v: number[] = [3, 6, 9, 12];
@@ -254,9 +239,51 @@ const OperatingCosts = {
     serviceCharge: 3000 // per quarter
 };
 
+const computeGroupOnPeriod = (a: any, b: string) => {
+    let retval;
+    if (b === 'year') {
+        retval = moment(a.date).format('YYYY');
+    } else if (b === 'day') {
+        retval = a.dayNo;
+    } else if (b === 'month') {
+        retval = moment(a.date).format('MMMYY');
+    } else if (b === 'quarter') {
+        retval = a.qtr;
+    } else if (b === 'week') {
+        retval = a.weekNo;
+    } else {
+        throw error('Group period is not set');
+    }
+    // console.log('the computer group period is', retval, a);
+    return retval;
+};
+
+/**             **********
+ *              CLASS LOCAL STOARAGE
+ *
+ *
+ */
+export class StoreLocalSettings {
+    static settingName = 'thackSettings';
+
+    static save(value: any[]) {
+        const str = JSON.stringify(value);
+        window.localStorage.setItem(StoreLocalSettings.settingName, str);
+    }
+
+    static retrieve() {
+
+        const data = window.localStorage.getItem(StoreLocalSettings.settingName);
+        const dat = data === null ? new FixedCostsImpl() : JSON.parse(data);
+        return dat;
+    }
+}
+
+/**                 ************
+ *                  CLASS ForecastModelBasic
+ *
+ */
 export class ForecastModelBasic {
-
-
     private static _varCosts(date: string): number {
         const dayOfYr = moment(date).diff('2018-01-01', 'days');
         return moment(date).quarter() * 1000 + dayOfYr;
@@ -267,15 +294,15 @@ export class ForecastModelBasic {
         return -(moment(date).quarter() * 1004 + dayOfYr);
     }
 
-    static fromDateObservable(from1: string = '01/01/2018', to: string = '04/01/2018',
+    static fromDateObservable(from1: string = '01/01/2018', to: string = '04/14/2018',
                               gap: string = 'day'): Observable<DateSequent> {
-        return Observable.create((observer: Observer<Dayts>) => {
-                let d = 0;
+        return Observable.create((observer: Observer<any>) => {
+                let d = 1;
                 let moDate = moment(from1);
 
                 while (moDate.isSameOrBefore(to)) {
 
-                    const v: Dayts = {
+                    const v = {
                         dateBucket: gap,
                         dayNo: d,
                         month: moment(moDate).month() + 1,
@@ -284,7 +311,7 @@ export class ForecastModelBasic {
                         weekNo: moment(moDate).isoWeek(),
                         isoWeekday: moment(moDate).isoWeekday(),
                         date: moDate.format('DD-MMM-YYYY'),
-                    } as Dayts;
+                    };
                     moDate = moment(from1).add(d, 'd');
                     observer.next(v);
                     d++;
@@ -297,26 +324,21 @@ export class ForecastModelBasic {
         );
     }
 
-
     /**
      * Visitor numbers have two trend annual footfall,
-     * @param {string} from1
-     * @param {string} to
-     * @param {string} bucket
-     * @returns {Observable<number>}
      */
     static observableVistorGenerator(from1: string = '01/01/2018', to: string = '04/01/2018',
                                      bucket: string = 'day'): Observable<number> {
-        return Observable.create((observer: Observer<Dayts>) => {
+        return Observable.create((observer: Observer<any>) => {
                 let frm = from1;
                 let dayno = 0;
                 while (moment(frm).isSameOrBefore(to)) {
                     frm = moment(from1).add(dayno, 'd').toISOString();
-                    const v: Dayts = {
+                    const v: any = {
                         dateBucket: bucket,
                         dayNo: dayno,
                         date: frm,
-                    } as Dayts;
+                    } as any;
                     observer.next(v);
                     dayno++;
                     if (dayno > 2140) {
@@ -327,17 +349,6 @@ export class ForecastModelBasic {
             }
         );
     }
-
-
-    /**
-     *
-     dayNo: d,
-     month: moment(moDate).month() + 1,
-     Year: moment(moDate).year(),
-     qtr: moment(moDate).quarter(),
-     weekNo: moment(moDate).isoWeek(),
-     date: moDate.format('DD-MMM-YYYY'),
-     */
 
     static computeVisitors(baseVisitorNo: number, monthno: number, isoWeekday: 1 | 2 | 3 | 4 | 5 | 6 | 7) {
         return (baseVisitorNo * weeklyVisitorBias[isoWeekday] * monthlyVisitorBias[monthno]).toPrecision(2);
@@ -374,31 +385,5 @@ export class ForecastModelBasic {
     }
 }
 
-const computeGroupOnPeriod = (a: any, b: string) => {
-    let retval;
-    if (b === 'year') {
-        retval = moment(a.date).format('YYYY');
-    } else if (b === 'day') {
-        retval = a.dayNo;
-    } else if (b === 'month') {
-        retval = moment(a.date).format('MMMYY');
-    } else if (b === 'quarter') {
-        retval = a.qtr;
-    } else if (b === 'week') {
-        retval = a.weekNo;
-    } else {
-        throw error('Group period is not set');
-    }
-    // console.log('the computer group period is', retval, a);
-    return retval;
-};
 
-/***
- * month: moment(moDate).month() + 1,
- year: moment(moDate).year(),
- qtr: moment(moDate).quarter(),
- weekNo: moment(moDate).isoWeek(),
- isoWeekday: moment(moDate).isoWeekday(),
- date: moDate.format('DD-MMM-YYYY'),
- */
 
