@@ -1,0 +1,14 @@
+<div class="spacer"></div>
+
+
+<mat-card>
+  <mat-card-title>
+    TODO'S
+  </mat-card-title>
+  <mat-list>
+    <mat-list-item *ngFor="let it of items">
+      <div class="title">{{it.title}} </div> <div class="note">{{it.note}}</div>
+    </mat-list-item>
+
+  </mat-list>
+</mat-card>

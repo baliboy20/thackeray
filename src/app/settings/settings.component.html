@@ -5,107 +5,17 @@
     </mat-toolbar>
 </div>
 
-<!--<div style="background-color: lightblue">-->
-    <!--<app-setting-edit></app-setting-edit>-->
-<!--</div>-->
-
 
 <mat-card>
-
-    <!--<mat-expansion-panel [expanded]="true">-->
-        <!--<mat-expansion-panel-header>-->
-            <!--<mat-panel-title>-->
-                <!--Fixed Costs-->
-            <!--</mat-panel-title>-->
-            <!--<mat-panel-description>-->
-                <!--Edit items-->
-            <!--</mat-panel-description>-->
-        <!--</mat-expansion-panel-header>-->
-
-        <!--<ng-container *ngTemplateOutlet="list"></ng-container>-->
-
-    <!--</mat-expansion-panel>-->
     <mat-list>
+        <b>List of Configurations for Fixed Costs</b>
         <mat-list-item *ngFor="let it of assumptions" >
-           <h4 matLine matTooltip="this is the default list"> Name:{{it.configName}}</h4>
+           <span matLine matTooltip="this is the default list">{{it.configName}}</span>
         </mat-list-item>
     </mat-list>
 
 
 </mat-card>
 
-<!--
-            LIST TEMPLATE
--->
 
-<ng-template #fart1>
-    <h4>helloo dolly</h4>
-        <span>{{it.configName}}</span>
-        <h4>Renta:</h4>
-        <div style="background-color: #f6f4ec">
-            {{it|json}}
-            Amount: <span>{{it.rent.amount}}</span> <br>
-            Frequency:<span>{{it.rent.frequency}}</span> <br>
-            Pay within: <span>{{it.rent.dayDue}}</span> <br>
-        </div>
-        <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rent, fldname:'Rent'}"></ng-container>
-        <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rates, fldname:'Rates'}"></ng-container>
-        <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.lease, fldname:'Leasing'}"></ng-container>
-        <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.serviceCharge, fldname:'Services'}"></ng-container>
-
-</ng-template>
-<!--
-            SUB LIST TEMPLATE
--->
-<!--<ng-template #detailFrom let-ob="sub" let-fname="fldname">-->
-    <!--<h3>{{fname}}</h3>-->
-    <!--<form novalidate #fm1="ngForm">-->
-        <!--<mat-form-field>-->
-            <!--<input type="text"-->
-                   <!--matInput-->
-                   <!--[(ngModel)]="ob.amount"-->
-                   <!--name="amount">-->
-            <!--<mat-hint>Amount to be paid</mat-hint>-->
-        <!--</mat-form-field>-->
-        <!--<mat-form-field>-->
-            <!--<input type="text"-->
-                   <!--matInput-->
-                   <!--[(ngModel)]="ob.dayDue"-->
-                   <!--name="datDue">-->
-            <!--<mat-hint>Payment terms (/days)</mat-hint>-->
-        <!--</mat-form-field>-->
-        <!--<mat-form-field>-->
-            <!--<mat-select-->
-                    <!--name="ddFrequency"-->
-                    <!--[(ngModel)]="ob.frequency"-->
-                    <!--placeholder="Period of reoccurence">-->
-                <!--<mat-option *ngFor="let period of [{key:'m', value:'month'}, {key:'q', value:'quarter'}]" [value]="period.key">-->
-                    <!--{{ period.value }}-->
-                <!--</mat-option>-->
-            <!--</mat-select>-->
-        <!--</mat-form-field>-->
-    <!--</form>-->
-
-<!--</ng-template>-->
-<!--
-            NEW RECORD TEMPLATE
--->
-<!--<ng-template #NewSettings let-it="newRec">-->
-
-
-    <!--<span>{{it.configName}}</span>-->
-    <!--<h4>Renta:</h4>-->
-    <!--<div style="background-color: #f6f4ec">-->
-        <!--{{it|json}}-->
-        <!--Amount: <span>{{it.rent.amount}}</span> <br>-->
-        <!--Frequency:<span>{{it.rent.frequency}}</span> <br>-->
-        <!--Pay within: <span>{{it.rent.dayDue}}</span> <br>-->
-    <!--</div>-->
-    <!--<ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rent, fldname:'Rent'}"></ng-container>-->
-    <!--<ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rates, fldname:'Rates'}"></ng-container>-->
-    <!--<ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.lease, fldname:'Leasing'}"></ng-container>-->
-    <!--<ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.serviceCharge, fldname:'Services'}"></ng-container>-->
-
-
-<!--</ng-template>-->
 

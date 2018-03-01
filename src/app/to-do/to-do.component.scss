@@ -1,0 +1,24 @@
+.spacer {
+  top: 0;
+  height: 64px;
+}
+
+.title, .note {}
+
+.title {
+  text-transform: capitalize;
+  font-size: 18px;
+  color: black;
+  margin-right: 20px;
+}
+
+.note {
+  color: lighten(black,20%);
+  font-size: 15px;
+}
+
+mat-card {
+  top: 75px;
+  width: 50%;
+  margin: 0 auto;
+}

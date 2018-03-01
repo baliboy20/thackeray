@@ -10,6 +10,7 @@ import {WhatifModule} from './whatif/whatif.module';
 import {VisualisationsModule} from './visualisations/visualisations.module';
 import {SettingsModule} from './settings/settings.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ToDoModule} from './to-do/to-do.module';
 
 
 @NgModule({
@@ -25,6 +26,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
       WhatifModule,
       VisualisationsModule,
       SettingsModule,
+      ToDoModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
