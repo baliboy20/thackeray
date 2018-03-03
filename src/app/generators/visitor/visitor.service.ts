@@ -22,6 +22,7 @@ import * as moment from 'moment';
 import {Observer} from 'rxjs/Observer';
 import {error} from 'util';
 import {reduce} from 'rxjs/operators';
+import {scan} from 'rxjs/operator/scan';
 
 
 /**                 ************
@@ -38,6 +39,7 @@ export class VisitorService {
     }
 
     getForecast(from1: string, to: string, interval1: string, forecastmodel?: any) {
+        ForecastModelBasic.baseModelGrouped1(from1, to, interval1);
         return ForecastModelBasic.baseModel(from1, to, interval1);
     }
 
@@ -76,13 +78,14 @@ export interface CostSalesSequent extends VisitorSequent {
 }
 
 export interface DateSequent {
+    dateBucket: string;
     dayNo: number;
     month: number;
     year: number;
     qtr: number;
     weekNo: number;
     date: string;
-    isoWeekday: string;
+    isoWeekday: number;
 }
 
 export interface VisitorSequent extends DateSequent {
@@ -93,7 +96,7 @@ export interface VisitorSequent extends DateSequent {
 /**                         *********
  *                          CONSTANTS
  */
-const VisitorSequentFactory: (ds: DateSequent, tradeBase) => VisitorSequent = (ds: DateSequent) =>
+export const VisitorSequentFactory: (ds: DateSequent, tradeBase) => VisitorSequent = (ds: DateSequent) =>
     ({
         dayNo: ds.dayNo,
         month: ds.month,
@@ -106,19 +109,31 @@ const VisitorSequentFactory: (ds: DateSequent, tradeBase) => VisitorSequent = (d
         isoWeekday: ds.isoWeekday
     } as VisitorSequent);
 
-const computeVisitors = (month, isoWeekday, trades) => {
+
+/**                         *********
+ *                          VisitorSequentFactory1
+ */
+export const VisitorSequentFactory1: (ds: DateSequent, tradeBase,
+                                      weeklyVisitorBias: WeeklyVisitorBias,
+                                      monthlyVisitorBias: MonthlyVisitorBias) => VisitorSequent = (ds: DateSequent) =>
+    ({
+        dayNo: ds.dayNo,
+        month: ds.month,
+        year: ds.year,
+        qtr: ds.qtr,
+        weekNo: ds.weekNo,
+        date: ds.date,
+        tradeBase: OperatingCosts.tradesBase,
+        trades: computeVisitors(ds.month, ds.isoWeekday, OperatingCosts.tradesBase),
+        isoWeekday: ds.isoWeekday
+    } as VisitorSequent);
+
+
+export const computeVisitors = (month, isoWeekday, trades) => {
     const tr = +(trades * monthlyVisitorBias[month] * weeklyVisitorBias[isoWeekday]);
     return tr;
 };
 
-// const format2Decimals = (value) => value.toFixed(2);
-export class FixedCostsImpl implements FixedCosts {
-    configName = 'defaultSettings';
-    serviceCharge = {amount: 300, frequency: 'q', dayDue: 30};
-    rent = {amount: 300, frequency: 'q', dayDue: 30};
-    rates = {amount: 300, frequency: 'q', dayDue: 30};
-    lease = {amount: 300, frequency: 'q', dayDue: 30};
-}
 
 export interface FixedCosts {
     configName: string;
@@ -206,6 +221,21 @@ const computeGroupedValues = (key) => {
     }, {} as CostSalesSequent);
 };
 
+export interface MonthlyVisitorBias {
+    '1': number;
+    '2': number;
+    '3': number;
+    '4': number;
+    '5': number;
+    '6': number;
+    '7': number;
+    '8': number;
+    '9': number;
+    '10': number;
+    '11': number;
+    '12': number;
+}
+
 const monthlyVisitorBias = {
     '1': .8,
     '2': 1,
@@ -220,6 +250,16 @@ const monthlyVisitorBias = {
     '11': 1,
     '12': .7    // dec
 };
+
+export interface WeeklyVisitorBias {
+    1: number;
+    2: number;
+    3: number;
+    4: number;
+    5: number;
+    6: number;
+    7: number;
+}
 
 const weeklyVisitorBias = {
     '1': 1, // su
@@ -239,7 +279,7 @@ const OperatingCosts = {
     serviceCharge: 3000 // per quarter
 };
 
-const computeGroupOnPeriod = (a: any, b: string) => {
+export const computeGroupOnPeriod = (a: any, b: string) => {
     let retval;
     if (b === 'year') {
         retval = moment(a.date).format('YYYY');
@@ -257,6 +297,19 @@ const computeGroupOnPeriod = (a: any, b: string) => {
     // console.log('the computer group period is', retval, a);
     return retval;
 };
+
+/**             **********
+ *              FixedCostsImpl
+ *
+ *
+ */
+export class FixedCostsImpl implements FixedCosts {
+    configName = 'defaultSettings';
+    serviceCharge = {amount: 300, frequency: 'q', dayDue: 30};
+    rent = {amount: 300, frequency: 'q', dayDue: 30};
+    rates = {amount: 300, frequency: 'q', dayDue: 30};
+    lease = {amount: 300, frequency: 'q', dayDue: 30};
+}
 
 /**             **********
  *              CLASS LOCAL STOARAGE
@@ -302,7 +355,7 @@ export class ForecastModelBasic {
 
                 while (moDate.isSameOrBefore(to)) {
 
-                    const v = {
+                    const v: DateSequent = {
                         dateBucket: gap,
                         dayNo: d,
                         month: moment(moDate).month() + 1,
@@ -354,9 +407,29 @@ export class ForecastModelBasic {
         return (baseVisitorNo * weeklyVisitorBias[isoWeekday] * monthlyVisitorBias[monthno]).toPrecision(2);
     }
 
+    /**                         *********
+     *                          VisitorSequentFactory1
+     */
+    static visitorSequentFactory1: (ds: DateSequent,
+                                    tradeBase: number,
+                                    weeklyVisitorBias: WeeklyVisitorBias,
+                                    monthlyVisitorBias: MonthlyVisitorBias) => VisitorSequent = (ds: DateSequent) =>
+        ({
+            dayNo: ds.dayNo,
+            month: ds.month,
+            year: ds.year,
+            qtr: ds.qtr,
+            weekNo: ds.weekNo,
+            date: ds.date,
+            tradeBase: OperatingCosts.tradesBase,
+            trades: computeVisitors(ds.month, ds.isoWeekday, OperatingCosts.tradesBase),
+            isoWeekday: ds.isoWeekday
+        } as VisitorSequent);
+
+
     static baseModel(from1: string = '02/01/2018', to: string = '26/01/2018',
                      gap: string = 'day'): Observable<CostSalesSequent> {
-        console.log('baseModel s', from1, to, gap);
+        // console.log('baseModel s', from1, to, gap);
         return this.fromDateObservable(from1, to, gap)
             .map((a: DateSequent) => VisitorSequentFactory(a, 100))
             .map(a => computeFixedCosts(a))
@@ -369,7 +442,7 @@ export class ForecastModelBasic {
 
     static baseModelGrouped(from1: string = '01/01/2018', to: string = '04/01/2018',
                             gap: string = 'day'): Observable<any> {
-        console.log('baseModelGrouped', from1, to, gap);
+        // console.log('baseModelGrouped', from1, to, gap);
         return this.fromDateObservable(from1, to, gap)
             .map((a: DateSequent) => VisitorSequentFactory(a, 100))
             .map(a => computeFixedCosts(a))
@@ -383,7 +456,132 @@ export class ForecastModelBasic {
             .flatMap(a => from(a).pipe(computeGroupedValues(a.key)));
         // .do(a => console.log(a));
     }
+
+
+    static computeCumTotals_1: (a: CostSalesSequent, b: CostSalesSequent, i: number) => CostSalesSequent =
+        (prev: CostSalesSequent, curr: CostSalesSequent, idx: number) => {
+
+            if (idx === 0) {
+                prev.cumProfit = prev.profit;
+                curr.cumProfit = prev.profit + curr.profit;
+                prev.cumVat = prev.vatOnSales;
+                curr.cumVat = prev.vatOnSales + curr.vatOnSales;
+                curr.cumTotalCosts = curr.totalCosts;
+                prev.cumTotalCosts = prev.totalCosts;
+                curr.cumTotalCosts = prev.cumTotalCosts + curr.totalCosts;
+                console.log('cum pr', curr.cumProfit);
+            } else {
+                curr.cumProfit = prev.cumProfit + curr.profit;
+                curr.cumVat = prev.cumVat + curr.vatOnSales;
+                curr.cumTotalCosts = prev.cumTotalCosts + curr.totalCosts;
+            }
+            return curr;
+        };
+
+    static groupByFactory(): CostSalesSequent {
+        const ini: CostSalesSequent =
+            {
+                date: null,
+                trades: 0,
+                fixedCosts: 0,
+                variableCosts: 0,
+                netSales: 0,
+                vatOnSales: 0,
+                totalCosts: 0,
+                profit: 0,
+                cashflow: 0,
+                cumVat: 0,
+                cumProfit: 0,
+                cumCosts: 0,
+                cumTotalCosts: 0,
+            } as CostSalesSequent;
+        return ini;
+    }
+
+    static aggByGroup(a, key, init) {
+        const ini = init;
+        // scan();
+    }
+
+    static baseModelGrouped1(from1: string = '01/01/2018', to: string = '04/01/2018',
+                             gap: string = 'day'): void {
+        // console.log('baseModelGrouped', from1, to, gap);
+        this.fromDateObservable(from1, to, gap)
+            .map((a: DateSequent) => VisitorSequentFactory(a, 100))
+            .map(a => computeFixedCosts(a))
+            .map(a => computeVariableCosts(a))
+            .map(a => computeFixedCosts(a))
+            .map(a => computeNetSales(a))
+            .map(a => computeTotalCosts(a))
+            // .scan(computeCumTotals)
+            .groupBy(a => computeGroupOnPeriod(a, gap))
+
+            .flatMap(a => from(a).pipe(computeGroupedValues(a.key)))
+            .do(a => console.log('GROUPED', a)).subscribe(a => a);
+
+    }
+
 }
 
+/**
+ Date
+ Transactions       | trades
+ Fixed Costs        | fixedCosts: number;
+ Variable Costs     | variableCosts
+ TotalCosts         | totalCosts
+ Net Sales          | netSales
+ Profit             | profit
+ cum. Profit        |cumProfit: number;
+ cum. Total Costs   | cumCosts: number;
+
+ Vat                |vatOnSales: number;
+ cum. Vat           |cumVat:
 
 
+
+ */
+
+/*
+fixedCosts: number;
+    variableCosts: number;
+    netSales: number;
+    vatOnSales: number;
+    totalCosts: number;
+    profit: number;
+    cashflow: number;
+    cumVat: number;
+    cumProfit: number;
+    cumCosts: number;
+    cumTotalCosts: number;
+ */
+
+/*
+export interface CostSalesSequent extends VisitorSequent {
+    fixedCosts: number;
+    variableCosts: number;
+    netSales: number;
+    vatOnSales: number;
+    totalCosts: number;
+    profit: number;
+    cashflow: number;
+    cumVat: number;
+    cumProfit: number;
+    cumCosts: number;
+    cumTotalCosts: number;
+}
+
+export interface DateSequent {
+    dayNo: number;
+    month: number;
+    year: number;
+    qtr: number;
+    weekNo: number;
+    date: string;
+    isoWeekday: string;
+}
+
+export interface VisitorSequent extends DateSequent {
+    trades: number;
+    tradeBase: number;
+}
+ */

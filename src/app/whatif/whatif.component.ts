@@ -6,23 +6,23 @@ import {ReplaySubject} from 'rxjs/ReplaySubject';
 
 import moment from 'moment/src/moment';
 
-@Component({
-    selector: 'app-cell',
-    styleUrls: ['./whatif.component.scss'],
-    template: `<table><tr><td class="cell"><span class="valueformat">{{value | numFmt}}</span></td></tr></table>`
-})
-export class CellOfTableComponent {
-    @Input('value') value: any;
-}
-
-@Component({
-    selector: 'app-hedr',
-    styleUrls: ['./whatif.component.scss'],
-    template: `<table><tr><td class="cell headerformat"><span class="">{{value}}</span></td></tr></table>`
-})
-export class HeaderOfTableComponent extends CellOfTableComponent {
-    @Input('value') value: any;
-}
+// @Component({
+//     selector: 'app-cell',
+//     styleUrls: ['./whatif.component.scss'],
+//     template: `<table><tr><td class="cell"><span class="valueformat">{{value | numFmt}}</span></td></tr></table>`
+// })
+// export class CellOfTableComponent {
+//     @Input('value') value: any;
+// }
+//
+// @Component({
+//     selector: 'app-hedr',
+//     styleUrls: ['./whatif.component.scss'],
+//     template: `<table><tr><td class="cell headerformat"><span class="">{{value}}</span></td></tr></table>`
+// })
+// export class HeaderOfTableComponent extends CellOfTableComponent {
+//     @Input('value') value: any;
+// }
 
 
 @Component({
@@ -64,20 +64,16 @@ export class WhatifComponent implements OnInit {
     }
 
     onRecompute() {
+        setTimeout(() => {
 
-        this.service.getForecast(this._from.toISOString(),
-            this._to.toISOString(),
-            'day',
-            null)
-            .toArray()
-            .subscribe(a => this.data$.next(a));
-        // this.service.getForecast("2/13/2018",
-        //     "2/18/2018",
-        //     'day',
-        //     null)kfdgsd
-        //     .toArray()
-        //     .subscribe(a => this.data$.next(a));
-        // console.log('xx', this.picker.nativeElement.value);
+            this.service.getForecast(this._from.toISOString(),
+                this._to.toISOString(),
+                'day',
+                null)
+                .toArray()
+                .subscribe(a => this.data$.next(a));
+        }, 15);
+
     }
 
     onDateChanged(to, event) {
