@@ -27,10 +27,10 @@
     <div class="table-col"> <hr></div>
     <div class="table-col">{{it.netSales|numFmt}}</div>
     <div class="table-col"> <hr></div>
-    <div class="table-col">{{it.profit|numFmt}}</div>
+    <div class="table-col" [style.color]="it.profit > 0 ? 'black' : 'red'">{{it.profit|numFmt}}</div>
 
     <div class="table-col"> <hr></div>
-    <div class="table-col">{{it.cumProfit|numFmt}}</div>
+    <div class="table-col" [style.color]="it.cumProfit > 0 ? 'black' : 'red'">{{it.cumProfit|numFmt}}</div>
 
     <div class="table-col">{{it.cumTotalCosts|numFmt}}</div>
     <div class="table-col"> <br></div>

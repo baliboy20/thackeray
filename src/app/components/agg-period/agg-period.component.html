@@ -1,26 +1,39 @@
-<div style="position:relative;top:0px;height:66px; background-color: lightblue">hello</div>
+<div style="position:relative;top:0px;height:66px;"></div>
 Aggregate Report
 <div class="table-container">
 
+  <!--'date',-->
+  <!--'trades',-->
+  <!--'profit',-->
+  <!--'breakline',-->
+  <!--'vatOnSales',-->
+  <!--'VariableCosts',-->
+  <!--'netSales',-->
+
   <div class="table-item">
     <div class="table-col">Date</div>
-    <div class="table-col">Fixed Costs</div>
-    <div class="table-col">Variable Costs</div>
+    <div class="table-col">Trades</div>
+    <div class="table-col">Profit</div>
     <div class="table-col"><hr></div>
-    <div class="table-col">TotalCosts</div>
-    <div class="table-col"> Trades</div>
+    <div class="table-col">Vat on Sales</div>
+    <div class="table-col">Variable Costs</div>
     <div class="table-col">Net Sales</div>
   </div>
   <div class="table-item" *ngFor="let it of data$">
     <ng-container *ngFor="let fldnam of flds">
 
-      <ng-container *ngIf="fldnam =='breakline'">
+      <ng-container *ngIf="fldnam =='breakline'; else flds">
         <div class="table-col"><hr></div>
       </ng-container>
 
-      <div class="table-col">{{it[fldnam]|numFmt}}</div>
-    </ng-container>
+      <ng-template #flds>
+        <div class="table-col">{{it[fldnam]|numFmt}}</div>
+      </ng-template>
 
+
+
+
+</ng-container>
 
   </div>
 </div>

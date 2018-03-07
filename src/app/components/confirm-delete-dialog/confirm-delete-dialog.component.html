@@ -1,0 +1,24 @@
+<div mat-dialog-title>
+  CONTINUE DELETED
+  <hr>
+  {{data.name}}
+</div>
+<div mat-dialog-content>
+
+</div>
+
+<div mat-dialog-actions style="margin-top:40px">
+
+  <button mat-button
+          style="margin-right: 20px; color: crimson"
+          (click)="onClose()">
+    CANCEL
+  </button>
+  <button mat-raised-button
+          color="primary"
+          [mat-dialog-close]="{status:'deleteConfirmed'}">
+    OK
+  </button>
+
+
+</div>

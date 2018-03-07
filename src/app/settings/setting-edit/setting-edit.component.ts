@@ -11,7 +11,7 @@ import {NgForm} from '@angular/forms';
 })
 export class SettingEditComponent implements OnInit {
     assumptions: FixedCostsImpl;
-    editstate = 'NEW_REC';
+    mode = 'NEW_REC';
 
     @ViewChild('fm1') set fm(value: NgForm) {
         value.statusChanges.subscribe(a => console.log(a));
@@ -30,7 +30,9 @@ export class SettingEditComponent implements OnInit {
 
     constructor(private ref: MatDialogRef<SettingEditComponent>,
                 @Inject(MAT_DIALOG_DATA) public data: any) {
-        this.assumptions = data.data;
+        console.log('mode', data);
+        this.assumptions = data.cfg;
+        this.mode = data.mode;
 
     }
 
@@ -39,6 +41,7 @@ export class SettingEditComponent implements OnInit {
     }
 
     onClose() {
+        console.log('onclode', this.data, this.mode);
         this.ref.close();
     }
 

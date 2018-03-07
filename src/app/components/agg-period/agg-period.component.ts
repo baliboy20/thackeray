@@ -14,8 +14,9 @@ export class AggPeriodComponent implements OnInit {
         'date',
         'trades',
         'profit',
+        'breakline',
         'vatOnSales',
-        'VariableCosts',
+        'variableCosts',
         'netSales',
     ];
 

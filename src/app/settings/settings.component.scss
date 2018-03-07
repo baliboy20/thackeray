@@ -2,3 +2,33 @@
   top: 0;
   height: 64px;
 }
+
+.td-label {
+  color: gray;
+  //border: 1px solid gainsboro;
+  border-radius: 5%;
+  margin: 0 ;
+  padding: 1px 5px;
+  font-size: 10px;
+}
+
+.title {
+  font-weight: bold;
+}
+
+:hover .over {
+  //background-color: gainsboro;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+//:hover .over + tr {
+//  background-color: darkred;
+//}
+
+.cfg-record {
+  border: 1px solid grey;
+  margin: 0 auto;
+  padding: 140px;
+
+}

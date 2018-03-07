@@ -12,6 +12,7 @@ import {SettingsModule} from './settings/settings.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ToDoModule} from './to-do/to-do.module';
 import {WhatifComponent} from './whatif/whatif.component';
+import {ConfigureModule} from './configure/configure.module';
 
 const appRoutes: Routes = [
     // {path: 'whatif', loadChildren: './whatif/whatif.module#WhatifModule' },
@@ -31,6 +32,7 @@ const appRoutes: Routes = [
       VisualisationsModule,
       SettingsModule,
       ToDoModule,
+      ConfigureModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,5 +1,5 @@
 <div mat-dialog-title>
-    ADD/EDIT
+    {{mode}}
 </div>
 <div mat-dialog-content>
     <ng-container *ngTemplateOutlet="list; context:{item: assumptions}"></ng-container>
@@ -14,7 +14,7 @@
     </button>
     <button mat-raised-button
             color="primary"
-            [mat-dialog-close]="{mode:editstate, data: assumptions}">
+            [mat-dialog-close]="{mode:mode, data: assumptions}">
         OK
     </button>
 
@@ -27,21 +27,36 @@
 
 <ng-template #list let-it="item">
     <form novalidate #fm1="ngForm">
-    <mat-form-field>
-        <input type="text"
-               (invalid)="onInvalid"
-               matInput
-               [(ngModel)]="it.configName"
-               required
-               name="willli">
-        <mat-hint>Name of this setting config</mat-hint>
+        <mat-form-field>
+            <input type="text"
+                   (invalid)="onInvalid"
+                   matInput
+                   [(ngModel)]="it.configName"
+                   required
+                   name="willli">
+            <mat-hint>Name of this setting config</mat-hint>
+            <mat-error>Required</mat-error>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+        <textarea type="text"
+                  (invalid)="onInvalid"
+                  matInput
+                  placeholder="Description..."
+                  rows="3"
+                  cols="30"
+                  [(ngModel)]="it.description"
+                  required
+                  name="descripton"> </textarea>
+        <mat-hint>Description</mat-hint>
         <mat-error>Required</mat-error>
-    </mat-form-field>
+        </mat-form-field>
 
-    <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rent, fldname:'Rent'}"></ng-container>
-    <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rates, fldname:'Rates'}"></ng-container>
-    <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.lease, fldname:'Leasing'}"></ng-container>
-    <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.serviceCharge, fldname:'Services'}"></ng-container>
+        <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rent, fldname:'Rent'}"></ng-container>
+        <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.rates, fldname:'Rates'}"></ng-container>
+        <ng-container *ngTemplateOutlet="detailFrom; context:{sub: it.lease, fldname:'Leasing'}"></ng-container>
+        <ng-container
+                *ngTemplateOutlet="detailFrom; context:{sub: it.serviceCharge, fldname:'Services'}"></ng-container>
     </form>
 
 </ng-template>
@@ -51,32 +66,32 @@
 <ng-template #detailFrom let-ob="sub" let-fname="fldname">
     <h3>{{fname}}</h3>
 
-        <mat-form-field>
-            <input type="text"
-                   matInput
-                   #amount="ngModel"
-                   required
-                   [(ngModel)]="ob.amount"
-                   name="amount">
-            <mat-hint>Amount to be paid</mat-hint>
-        </mat-form-field>
-        <mat-form-field>
-            <input type="text"
-                   matInput
-                   [(ngModel)]="ob.dayDue"
-                   name="datDue">
-            <mat-hint>Payment terms (/days)</mat-hint>
-        </mat-form-field>
-        <mat-form-field>
-            <mat-select
-                    name="ddFrequency"
-                    [(ngModel)]="ob.frequency"
-                    placeholder="Period of reoccurence">
-                <mat-option *ngFor="let period of [{key:'m', value:'month'}, {key:'q', value:'quarter'}]"
-                            [value]="period.key">
-                    {{ period.value }}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
+    <mat-form-field>
+        <input type="text"
+               matInput
+               #amount="ngModel"
+               required
+               [(ngModel)]="ob.amount"
+               name="amount">
+        <mat-hint>Amount to be paid</mat-hint>
+    </mat-form-field>
+    <mat-form-field>
+        <input type="text"
+               matInput
+               [(ngModel)]="ob.dayDue"
+               name="datDue">
+        <mat-hint>Payment terms (/days)</mat-hint>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-select
+                name="ddFrequency"
+                [(ngModel)]="ob.frequency"
+                placeholder="Period of reoccurence">
+            <mat-option *ngFor="let period of [{key:'m', value:'month'}, {key:'q', value:'quarter'}]"
+                        [value]="period.key">
+                {{ period.value }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
 </ng-template>
 

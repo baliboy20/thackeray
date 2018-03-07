@@ -2,20 +2,86 @@
 <div>
     <mat-toolbar>
         <button mat-icon-button (click)="openDialog()"> <mat-icon>add</mat-icon></button>
+        <button mat-icon-button (click)="refreshClicked" matTooltip="refresh"> <mat-icon>cached</mat-icon></button>
     </mat-toolbar>
 </div>
 
 
+
 <mat-card>
-    <mat-list>
-        <b>List of Configurations for Fixed Costs</b>
-        <mat-list-item *ngFor="let it of assumptions" >
-           <span matLine matTooltip="this is the default list">{{it.configName}}</span>
-        </mat-list-item>
-    </mat-list>
+    <mat-card-title>List of Configurations for Fixed Costs</mat-card-title>
+<table class="cfg-record">
+    <ng-container *ngFor="let it of assumptions">
+        <tr>
+            <td>
+                <hr>
+            </td>
+        </tr>
+        <tr>
+            <td #over
+                (click)="onConfigClicked(it)"
+                class="title"><h4>{{it.configName}}</h4></td>
+            <td colspan="3">
+               <i> {{it.description}}</i>
+            </td>
+            <td>
+                <button mat-icon-button (click)="removeItem(it)"> <mat-icon>delete_forever</mat-icon></button>
+
+            </td>
+
+        </tr>
 
 
+        <tr *ngClass="">
+            <td>Rent</td>
+            <td class="td-label">amount:</td>
+            <td>{{it.rent.amount}}</td>
+            <td class="td-label">frequency:</td>
+            <td>{{it.rent.frequency}}</td>
+            <td class="td-label">Day due:</td>
+            <td>{{it.rent.dayDue}}</td>
+        </tr>
+        <tr>
+            <td>Rates</td>
+            <td class="td-label"></td>
+            <td>{{it.rates.amount}}</td>
+            <td class="td-label"></td>
+            <td>{{it.rates.frequency}}</td>
+            <td class="td-label"></td>
+            <td>{{it.rates.dayDue}}</td>
+        </tr>
+        <tr>
+            <td>Equip leases</td>
+            <td class="td-label"></td>
+            <td>{{it.lease.amount}}</td>
+            <td class="td-label"></td>
+            <td>{{it.lease.frequency}}</td>
+            <td class="td-label"></td>
+            <td>{{it.lease.dayDue}}</td>
+        </tr>
+        <tr>
+            <td>Service Charge</td>
+
+            <td class="td-label"></td>
+            <td>{{it.serviceCharge.amount}}</td>
+            <td class="td-label"></td>
+            <td>{{it.serviceCharge.frequency}}</td>
+            <td class="td-label"></td>
+            <td>{{it.serviceCharge.dayDue}}</td>
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+
+    </ng-container>
+</table>
 </mat-card>
 
-
-
+<h4>Variable costs</h4>
+<ul>
+    <li>Salaryes</li>
+    <li>food / coffe split</li>
+    <li>daily Sales basis (100)</li>
+    <li>Average spend</li>
+    <li>sales margin</li>
+</ul>

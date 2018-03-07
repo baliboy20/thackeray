@@ -44,18 +44,26 @@ export class VisitorService {
         return ForecastModelBasic.baseModel(from1, to, interval1);
     }
 
-    getForecastGrouped(from1: string, to: string, interval1: string, forecastmodel?: any) {
-        return ForecastModelBasic.baseModelGrouped(from1, to, interval1);
+    getForecastGrouped(from1: string, to: string, gap: string, forecastmodel?: any) {
+        return ForecastModelBasic.baseModelGrouped(from1, to, gap);
     }
 
-    getAssumptions() {
+    retrieveAssumptions() {
         return StoreLocalSettings.retrieve();
     }
 
-    setAssuptions(assumps: any) {
-        console.log('assumptions have been srt', assumps);
+    persistAssuptions(assumps: any) {
+        // console.log('assumptions have been srt', assumps);
         StoreLocalSettings.save(assumps);
 
+    }
+
+    applyAssumption(assum) {
+        ForecastModelBasic.fixedCostAssumptions =(assum);
+    }
+
+    getCurrentAssumptions() {
+        return ForecastModelBasic.fixedCostAssumptions;
     }
 }
 
@@ -118,11 +126,9 @@ export const computeVisitors = (month, isoWeekday, trades) => {
     return tr;
 };
 
-const aa = 'kkk';
-
-
 export interface FixedCosts {
     configName: string;
+    description: string;
     serviceCharge: { amount: number, frequency: string, dayDue: number };
     rent: { amount: number, frequency: string, dayDue: number };
     rates: { amount: number, frequency: string, dayDue: number };
@@ -130,21 +136,21 @@ export interface FixedCosts {
 }
 
 // @Deprecated
-const computeFixedCosts: (arg: VisitorSequent) => CostSalesSequent = (arg: VisitorSequent) => {
-    const f = ForecastModelBasic.dec2;
-    const v: number[] = [3, 6, 9, 12];
-    const fc: CostSalesSequent = arg as CostSalesSequent;
-    const ohds = (v.includes(arg.month) && moment(arg.date).format('D') === '1') ? OPERATING_COSTS.serviceCharge : 0;
-    const rent = moment(arg.date).format('D') === '1' ? OPERATING_COSTS.rent : 0;
-    const staff = OPERATING_COSTS.staffPerDay;
-    fc.fixedCosts = +(ohds + staff + rent).toPrecision(2);
-    fc.cumVat = 0;
-    fc.cumProfit = 0;
-    fc.cashflow = 0;
-    fc.cumCosts = 0;
-    fc.profit = 0;
-    return fc;
-};
+// const computeFixedCosts: (arg: VisitorSequent) => CostSalesSequent = (arg: VisitorSequent) => {
+//     const f = ForecastModelBasic.dec2;
+//     const v: number[] = [3, 6, 9, 12];
+//     const fc: CostSalesSequent = arg as CostSalesSequent;
+//     const ohds = (v.includes(arg.month) && moment(arg.date).format('D') === '1') ? OPERATING_COSTS.serviceCharge : 0;
+//     const rent = moment(arg.date).format('D') === '1' ? OPERATING_COSTS.rent : 0;
+//     const staff = OPERATING_COSTS.staffPerDay;
+//     fc.fixedCosts = +(ohds + staff + rent).toPrecision(2);
+//     fc.cumVat = 0;
+//     fc.cumProfit = 0;
+//     fc.cashflow = 0;
+//     fc.cumCosts = 0;
+//     fc.profit = 0;
+//     return fc;
+// };
 
 // const computeVariableCosts: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
 //     if(a) throw new Error('const computeVariableCosts: old program');
@@ -170,7 +176,7 @@ const computeCumTotals: (a: CostSalesSequent, b: CostSalesSequent, i: number) =>
             curr.cumTotalCosts = curr.totalCosts;
             prev.cumTotalCosts = prev.totalCosts;
             curr.cumTotalCosts = prev.cumTotalCosts + curr.totalCosts;
-            console.log('cum pr', curr.cumProfit);
+            // console.log('cum pr', curr.cumProfit);
         } else {
             curr.cumProfit = prev.cumProfit + curr.profit;
             curr.cumVat = prev.cumVat + curr.vatOnSales;
@@ -179,38 +185,39 @@ const computeCumTotals: (a: CostSalesSequent, b: CostSalesSequent, i: number) =>
         return curr;
     };
 
-const computeNetSales: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
-    a.netSales = (a as VisitorSequent).trades *
-        OPERATING_COSTS.averageSale;
-    a.vatOnSales = (a as VisitorSequent).trades *
-        OPERATING_COSTS.averageSale * .2;
-    // console.log("xxxii", OperatingCosts.averageSale, a.trades);
-    return a;
-};
+// const computeNetSales: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
+//     a.netSales = (a as VisitorSequent).trades *
+//         OPERATING_COSTS.averageSale;
+//     a.vatOnSales = (a as VisitorSequent).trades *
+//         OPERATING_COSTS.averageSale * .2;
+//     // console.log("xxxii", OperatingCosts.averageSale, a.trades);
+//     return a;
+// };
 
 // Grouped computes
-const computeGroupedValues = (key) => {
-    return reduce((acc: CostSalesSequent, curr: CostSalesSequent, idx) => {
-        if (idx === 0) {
-            acc.trades = 0;
-            acc.profit = 0;
-            acc.vatOnSales = 0;
-            acc.variableCosts = 0;
-            acc.vatOnSales = 0;
-            acc.netSales = 0;
-        } else {
-            acc.trades += curr.trades;
-            acc.profit += curr.profit;
-            acc.vatOnSales += curr.vatOnSales;
-            acc.variableCosts += curr.variableCosts;
-            acc.netSales += curr.netSales;
-        }
-        acc.date = key;
-        return acc;
-    }, {} as CostSalesSequent);
-};
+// const computeGroupedValues = (key) => {
+//     return reduce((acc: CostSalesSequent, curr: CostSalesSequent, idx) => {
+//         if (idx === 0) {
+//             acc.trades = 0;
+//             acc.profit = 0;
+//             acc.vatOnSales = 0;
+//             acc.variableCosts = 0;
+//             acc.vatOnSales = 0;
+//             acc.netSales = 0;
+//         } else {
+//             acc.trades += curr.trades;
+//             acc.profit += curr.profit;
+//             acc.vatOnSales += curr.vatOnSales;
+//             acc.variableCosts += curr.variableCosts;
+//             acc.netSales += curr.netSales;
+//         }
+//         acc.date = key;
+//         return acc;
+//     }, {} as CostSalesSequent);
+// };
 
 export interface MonthlyVisitorBias {
+    description: string;
     '1': number;
     '2': number;
     '3': number;
@@ -226,6 +233,7 @@ export interface MonthlyVisitorBias {
 }
 
 const MONTHLY_VISITOR_BIAS = {
+    description: 'Default config',
     '1': .8,
     '2': 1,
     '3': 1.02,  // mar
@@ -241,6 +249,7 @@ const MONTHLY_VISITOR_BIAS = {
 };
 
 export interface WeeklyVisitorBias {
+    description: string;
     1: number;
     2: number;
     3: number;
@@ -251,6 +260,7 @@ export interface WeeklyVisitorBias {
 }
 
 const WEEKLY_VISITOR_BIAS = {
+    description: 'Default config',
     '1': 1, // su
     '2': .5, // mo
     '3': .8, // tu
@@ -280,14 +290,19 @@ export const computeGroupOnPeriod = (a: any, b: string) => {
     let retval;
     if (b === 'year') {
         retval = moment(a.date).format('YYYY');
+
     } else if (b === 'day') {
         retval = a.dayNo;
+
     } else if (b === 'month') {
         retval = moment(a.date).format('MMMYY');
+
     } else if (b === 'quarter') {
         retval = a.qtr;
+
     } else if (b === 'week') {
         retval = a.weekNo;
+
     } else {
         throw error('Group period is not set');
     }
@@ -295,20 +310,21 @@ export const computeGroupOnPeriod = (a: any, b: string) => {
     return retval;
 };
 
-/**             **********
+/**             **************
  *              FixedCostsImpl
  *
  *
  */
 export class FixedCostsImpl implements FixedCosts {
     configName = 'defaultSettings';
-    serviceCharge = {amount: 300, frequency: 'q', dayDue: 30};
-    rent = {amount: 300, frequency: 'q', dayDue: 30};
-    rates = {amount: 300, frequency: 'q', dayDue: 30};
-    lease = {amount: 300, frequency: 'q', dayDue: 30};
+    description = 'Default Settings';
+    serviceCharge = {amount: 14000 / 12, frequency: 'q', dayDue: 30};
+    rent = {amount: 30000 / 12, frequency: 'q', dayDue: 30};
+    rates = {amount: 5000 / 12, frequency: 'q', dayDue: 30};
+    lease = {amount: 200, frequency: 'q', dayDue: 30};
 }
 
-/**             **********
+/**             ********************
  *              CLASS LOCAL STOARAGE
  *
  *
@@ -329,11 +345,22 @@ export class StoreLocalSettings {
     }
 }
 
-/**                 ************************************************************************************************************************
- *                  CLASS ForecastModelBasic
- *                  ************************************************************************************************************************
+/**        ************************************************************************************************************************
+ *          CLASS ForecastModelBasic
+ *         ************************************************************************************************************************
  */
 export class ForecastModelBasic {
+    static weeklyVisitorBias: WeeklyVisitorBias = WEEKLY_VISITOR_BIAS;
+    static monthlyVisitorBias: MonthlyVisitorBias = MONTHLY_VISITOR_BIAS;
+    static _fixedCostAssumptions: FixedCosts = new FixedCostsImpl() as FixedCosts;
+
+    static set fixedCostAssumptions(value) {
+        this.fixedCostAssumptions = value;
+    }
+
+    static get fixedCostAssumptions() {
+        return this._fixedCostAssumptions;
+    }
 
     static computeGroupedValues = (key) => {
         const seed = {
@@ -345,14 +372,14 @@ export class ForecastModelBasic {
         };
 
         return reduce((acc: CostSalesSequent, curr: CostSalesSequent, idx) => {
-                acc.trades += curr.trades;
-                acc.profit += curr.profit;
-                acc.vatOnSales += curr.vatOnSales;
-                acc.variableCosts += curr.variableCosts;
-                acc.netSales += curr.netSales;
+            acc.trades += curr.trades;
+            acc.profit += curr.profit;
+            acc.vatOnSales += curr.vatOnSales;
+            acc.variableCosts += curr.variableCosts;
+            acc.netSales += curr.netSales;
             acc.date = key;
             return acc;
-        }, seed );
+        }, seed);
     };
 
     private static _varCosts(date: string): number {
@@ -396,7 +423,7 @@ export class ForecastModelBasic {
                 curr.cumTotalCosts = curr.totalCosts;
                 prev.cumTotalCosts = prev.totalCosts;
                 curr.cumTotalCosts = prev.cumTotalCosts + curr.totalCosts;
-                console.log('cum pr', curr.cumProfit);
+                // console.log('cum pr', curr.cumProfit);
             } else {
                 curr.cumProfit = prev.cumProfit + curr.profit;
                 curr.cumVat = prev.cumVat + curr.vatOnSales;
@@ -408,25 +435,28 @@ export class ForecastModelBasic {
     /***
      * the accumilator holds ont the running/ cumilative totals updateds the current object and moves on
      * */
-    static computeRunningTotals() {
-        // static computeRunningTotals (a: Observable<CostSalesSequent>, seed = {cumProfit: 0, profit: 0, cumTotalCosts: 0,  cumVat: 0, cumTotalSales: 0 }) {
+    static computeRunningTotals(prev: CostSalesSequent, curr: CostSalesSequent, idx) {
 
-        const computer = (acc: CostSalesSequent, curr: CostSalesSequent) => {
-            curr.profit = curr.totalCosts; // curr.netSales; // -
-            // holding on
-            acc.cumTotalCosts += curr.totalCosts;
-            acc.cumTotalSales += curr.netSales;
-            acc.cumProfit += curr.profit;
-            // cpy into current
-            curr.cumTotalCosts = acc.cumTotalCosts;
-            curr.cumTotalSales = acc.cumTotalSales;
-            curr.cumProfit = acc.cumProfit;
-            return curr;
-        };
-        const seed = {cumProfit: 0, profit: 0, cumTotalCosts: 0, cumVat: 0, cumTotalSales: 0};
-        // const [run, seedr] = [computer, seed];
-        return [computer, seed];
+        if (idx === 0) {
+            prev.cumProfit = prev.profit;
+            prev.cumTotalSales = prev.netSales;
+            prev.cumVat = prev.vatOnSales;
+            prev.cumTotalCosts = prev.totalCosts;
+
+            curr.cumProfit = curr.profit;
+            curr.cumVat = curr.vatOnSales;
+            curr.cumTotalCosts = curr.totalCosts;
+            curr.cumTotalSales = curr.netSales;
+            console.log('cum pr', curr.cumProfit);
+        } else {
+            curr.cumProfit = prev.cumProfit + curr.profit;
+            curr.cumVat = prev.cumVat + curr.vatOnSales;
+            curr.cumTotalCosts = prev.cumTotalCosts + curr.totalCosts;
+            curr.cumTotalSales = prev.cumTotalSales + curr.netSales;
+        }
+        return curr;
     };
+
 
     /** */
     static computeFixedCosts(arg: DateSequent, fco: FixedCosts) {
@@ -471,8 +501,8 @@ export class ForecastModelBasic {
 
     /** */
     static computeVariableCosts: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
-        a.variableCosts = +((a as VisitorSequent).trades *
-            OPERATING_COSTS.averageSale * .33);
+        a.variableCosts = ((a as VisitorSequent).trades *
+            OPERATING_COSTS.averageSale * .33 + OPERATING_COSTS.staffPerDay);
         return a;
     };
 
@@ -581,34 +611,40 @@ export class ForecastModelBasic {
     static baseModel(from1: string = '02/01/2018', to: string = '26/01/2018',
                      gap: string = 'day'): Observable<CostSalesSequent> {
         const fc = ForecastModelBasic;
+        const fixc = new FixedCostsImpl();
+        const wvb = fc.weeklyVisitorBias;
+        const mvb = fc.monthlyVisitorBias;
+
         return this.fromDateObservable(from1, to, gap)
-            .map((a: DateSequent) => VisitorSequentFactory(a, 100))
-            .map(a => computeFixedCosts(a))
+            .map((a: DateSequent) => ForecastModelBasic.visitorSequentFactory1(a, 100, wvb, mvb))
+            .map(a => (a as CostSalesSequent))
+            .map(a => fc.computeFixedCosts(a, fixc))
             .map(a => fc.computeVariableCosts(a))
-            .map(a => computeFixedCosts(a))
-            .map(a => computeNetSales(a))
-            .map(a => computeTotalCosts(a))
-            .scan(computeCumTotals);
+            .map(a => fc.computeNetSales(a, 2.2))
+            .map(a => fc.computeTotalCosts(a))
+            .scan(fc.computeRunningTotals);
     }
 
     static baseModelGrouped(from1: string = '01/01/2018', to: string = '04/01/2018',
                             gap: string = 'day'): Observable<any> {
-        // console.log('baseModelGrouped', from1, to, gap);
         const fc = ForecastModelBasic;
-        return this.fromDateObservable(from1, to, gap)
-            .map((a: DateSequent) => VisitorSequentFactory(a, 100))
-            .map(a => computeFixedCosts(a))
-            .map(a => fc.computeVariableCosts(a))
-            .map(a => computeFixedCosts(a))
-            .map(a => computeNetSales(a))
-            .map(a => computeTotalCosts(a))
-            .scan(computeCumTotals)
-            // .groupBy(a => moment(a).week())
-            .groupBy(a => computeGroupOnPeriod(a, gap))
-            .flatMap(a => from(a).pipe(computeGroupedValues(a.key)));
-        // .do(a => console.log(a));
-    }
 
+        const fixc = new FixedCostsImpl();
+        const wvb = fc.weeklyVisitorBias;
+        const mvb = fc.monthlyVisitorBias;
+
+        return this.fromDateObservable(from1, to, gap)
+            .map((a: DateSequent) => ForecastModelBasic.visitorSequentFactory1(a, 100, wvb, mvb))
+            .map(a => (a as CostSalesSequent))
+            .map(a => fc.computeVariableCosts(a))
+            .map(a => fc.computeFixedCosts(a, fixc))
+            .map(a => fc.computeVariableCosts(a))
+            .map(a => fc.computeNetSales(a, 2.2))
+            .map(a => fc.computeTotalCosts(a))
+            .scan(fc.computeRunningTotals)
+            .groupBy(a => fc.computeGroupOnPeriod(a, gap))
+            .flatMap(a => from(a).pipe(fc.computeGroupedValues(a.key)));
+    }
 
     static computeCumTotals_1: (a: CostSalesSequent, b: CostSalesSequent, i: number) => CostSalesSequent =
         (prev: CostSalesSequent, curr: CostSalesSequent, idx: number) => {
@@ -621,7 +657,7 @@ export class ForecastModelBasic {
                 curr.cumTotalCosts = curr.totalCosts;
                 prev.cumTotalCosts = prev.totalCosts;
                 curr.cumTotalCosts = prev.cumTotalCosts + curr.totalCosts;
-                console.log('cum pr', curr.cumProfit);
+                // console.log('cum pr', curr.cumProfit);
             } else {
                 curr.cumProfit = prev.cumProfit + curr.profit;
                 curr.cumVat = prev.cumVat + curr.vatOnSales;
@@ -654,102 +690,5 @@ export class ForecastModelBasic {
         const ini = init;
         // scan();
     }
-
-    static baseModelGrouped1(from1: string = '01/01/2018', to: string = '04/01/2018',
-                             gap: string = 'day', pWvb: WeeklyVisitorBias, pMvb: MonthlyVisitorBias,
-                             pOc?: FixedCosts): void {
-        console.log('running thru basemodelBrouped1');
-        const f = ForecastModelBasic;
-        const wvb = pWvb;
-        const mvb = pMvb;
-        const oc = pOc;
-        const avSell = 2.2;
-        const [computer, seed] = f.computeRunningTotals() as [any, any];
-        this.fromDateObservable(from1, to, gap)
-            .map((a: DateSequent) => f.visitorSequentFactory1(a, 100, wvb, mvb))
-            .map(a => f.computeFixedCosts(a, oc))
-            .map(a => f.computeVariableCosts(a))
-            //.map(a => computeFixedCosts(a))
-            .map(a => f.computeNetSales(a, avSell))
-            .scan(computer, seed)
-            // .scan(computeCumTotals)   // todo implenment this after grouby
-            .groupBy(a => computeGroupOnPeriod(a, gap))
-
-            .flatMap(a => from(a).pipe(computeGroupedValues(a.key)))
-            .do(a => console.log('GROUPED', a)).subscribe(a => a);
-    }
-
 }
 
-/**
- Date
- Transactions       | trades
- Fixed Costs        | fixedCosts: number;
- Variable Costs     | variableCosts
- TotalCosts         | totalCosts
- Net Sales          | netSales
- Profit             | profit
- cum. Profit        |cumProfit: number;
- cum. Total Costs   | cumCosts: number;
-
- Vat                |vatOnSales: number;
- cum. Vat           |cumVat:
-
-
-
- */
-
-/*
-
-300g - 30p
-2tsp 1p
-1tsp powder 2p
-soda 2p
-400ml powder milk 40 : 12p
-oil :20
-62
-
-
-fixedCosts: number;
-    variableCosts: number;
-    netSales: number;
-    vatOnSales: number;
-    totalCosts: number;
-    profit: number;
-    cashflow: number;
-    cumVat: number;
-    cumProfit: number;
-    cumCosts: number;
-    cumTotalCosts: number;
- */
-
-/*
-export interface CostSalesSequent extends VisitorSequent {
-    fixedCosts: number;
-    variableCosts: number;
-    netSales: number;
-    vatOnSales: number;
-    totalCosts: number;
-    profit: number;
-    cashflow: number;
-    cumVat: number;
-    cumProfit: number;
-    cumCosts: number;
-    cumTotalCosts: number;
-}
-
-export interface DateSequent {
-    dayNo: number;
-    month: number;
-    year: number;
-    qtr: number;
-    weekNo: number;
-    date: string;
-    isoWeekday: string;
-}
-
-export interface VisitorSequent extends DateSequent {
-    trades: number;
-    tradeBase: number;
-}
- */

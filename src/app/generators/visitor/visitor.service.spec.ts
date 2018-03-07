@@ -61,15 +61,16 @@ describe('VisitorService', () => {
             providers: [VisitorService]
         });
         s = new Subject();
+        console.log('BEFORE EACH');
     });
 
     afterEach(() => console.log('TES HAS RUN SUCCESSFULLL'));
 
-    xit('The Visitor service is injected', inject([VisitorService], (service: VisitorService) => {
+    it('The Visitor service is injected', inject([VisitorService], (service: VisitorService) => {
         expect(service).toBeTruthy();
     }));
 
-    xit('ForecastModelBasic to exist)', inject([VisitorService], (service: VisitorService) => {
+    it('ForecastModelBasic to exist)', inject([VisitorService], (service: VisitorService) => {
         expect(ForecastModelBasic).toBeTruthy();
     }));
 
@@ -116,6 +117,60 @@ describe('VisitorService', () => {
 
 
     }));
+
+
+    it(' REAL :: Predicting Visitors for Weekdays', inject([VisitorService], (service: VisitorService) => {
+        const bmg1 = ForecastModelBasic.fromDateObservable('02/05/2018', '02/11/2018',
+            'day');
+
+
+        // const MONTHLY_VISITOR_BIAS = {
+        //     '1': .8,
+        //     '2': 1,
+        //     '3': 1.02,  // mar
+        //     '4': 1.03,
+        //     '5': 1.04,
+        //     '6': 1.1,
+        //     '7': 1.2,   // jul
+        //     '8': 1.1,
+        //     '9': 1.1,   // sep
+        //     '10': 1,
+        //     '11': 1,
+        //     '12': .7    // dec
+        // };
+        //
+        // const WEEKLY_VISITOR_BIAS = {
+        //     '1': 1, // m
+        //     '2': .5, // tu
+        //     '3': .8, // w
+        //     '4': 1.2,  // th
+        //     '5': 1.5,  // f
+        //     '6': 1.5, // sa
+        //     '7': 1.8, // su
+        // };
+
+
+        const w = ForecastModelBasic.weeklyVisitorBias;
+        const m = ForecastModelBasic.monthlyVisitorBias;
+        bmg1.map((a: DateSequent) => ForecastModelBasic.visitorSequentFactory1(a, 100, w, m))
+            .toArray()
+            .subscribe(a => {
+                console.log('\n\n\n\nvalues ar ', '\n\n\n\n');
+                //const ans = [100, 1000, 10000, 12000, 20, 200, 300];
+                let num = 0;
+                for (const idx in a) {
+num +=a[idx]['trades'];
+                    console.log( a[idx].isoWeekday, a[idx]['trades']);
+                }
+                console.log(`Toal trades is ${num}`)
+            });
+
+    }));
+
+
+
+
+
     xit('Predicting Visitors for Months', inject([VisitorService], (service: VisitorService) => {
         const bmg1 = ForecastModelBasic.fromDateObservable('05/07/2018', '05/13/2018',
             'day');
@@ -316,14 +371,14 @@ describe('VisitorService', () => {
             // .take(3)
             .toArray()
             .subscribe(a => {
-               // console.log( console.log('KKK', a));
+                // console.log( console.log('KKK', a));
                 expect(a[0].cumProfit).toEqual(1136.7);
                 expect(a[1].cumProfit).toEqual(1463.4);
                 expect(a[2].cumProfit).toEqual(1463.4);
             });
     }));
 
-    it('Compute groupby', inject([VisitorService], (service: VisitorService) => {
+    xit('Compute groupby', inject([VisitorService], (service: VisitorService) => {
         const fc = ForecastModelBasic;
         const seg: CostSalesSequent = {} as CostSalesSequent;
         const wvb = {
@@ -358,18 +413,64 @@ describe('VisitorService', () => {
             .map(a => fc.computeTotalCosts(a))
             .scan(computeTotals, seed)
             .groupBy(a => fc.computeGroupOnPeriod(a, gap))
-             .flatMap(a => from(a).pipe(fc.computeGroupedValues(a.key)))
+            .flatMap(a => from(a).pipe(fc.computeGroupedValues(a.key)))
 
             // .toArray()
             .subscribe(a => {
-                console.log( console.log( a));
+                console.log(console.log(a));
                 // expect(a[0].cumProfit).toEqual(1136.7);
                 // expect(a[1].cumProfit).toEqual(1463.4);
                 // expect(a[2].cumProfit).toEqual(1463.4);
+                expect(ForecastModelBasic).toBeTruthy();
             });
     }));
 
-
+    // xit('Compute groupby', inject([VisitorService], (service: VisitorService) => {
+    //     const fc = ForecastModelBasic;
+    //     const seg: CostSalesSequent = {} as CostSalesSequent;
+    //     const wvb = {
+    //         1: 2, 2: 3,
+    //         3: 1,
+    //         4: 10,
+    //         5: 6,
+    //         6: 1, 7: 1
+    //     };
+    //     const mvb: MonthlyVisitorBias = {
+    //         1: 1, 2: 1, 3: 1,
+    //         4: 1.5,
+    //         5: 1,
+    //         6: 1,
+    //         7: 1,
+    //         8: 1,
+    //         9: 1,
+    //         10: 1, 11: 1, 12: 1
+    //     };
+    //
+    //     const [from1, two, gap] = ['04/01/2018', '09/03/2018', 'month'];
+    //     const bmg1 = ForecastModelBasic.fromDateObservable(from1, two, gap)
+    //         .map((a: DateSequent) => ForecastModelBasic.visitorSequentFactory1(a, 100, wvb, mvb));
+    //
+    //     const [computeTotals, seed] = fc.computeRunningTotals() as [any, any];
+    //     bmg1.map((a: DateSequent) => ForecastModelBasic.visitorSequentFactory1(a, 100, wvb, mvb))
+    //         .map(a => (a as CostSalesSequent))
+    //         .map(a => fc.computeVariableCosts(a))
+    //         .map(a => fc.computeFixedCosts(a, test_fixedCosts))
+    //         .map(a => fc.computeVariableCosts(a))
+    //         .map(a => fc.computeNetSales(a, 2.2))
+    //         .map(a => fc.computeTotalCosts(a))
+    //         .scan(computeTotals, seed)
+    //         .groupBy(a => fc.computeGroupOnPeriod(a, gap))
+    //         .flatMap(a => from(a).pipe(fc.computeGroupedValues(a.key)))
+    //
+    //         // .toArray()
+    //         .subscribe(a => {
+    //             console.log( console.log( a));
+    //             // expect(a[0].cumProfit).toEqual(1136.7);
+    //             // expect(a[1].cumProfit).toEqual(1463.4);
+    //             // expect(a[2].cumProfit).toEqual(1463.4);
+    //             expect(ForecastModelBasic).toBeTruthy();
+    //         });
+    // }));
 
 
 });
