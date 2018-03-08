@@ -1,0 +1,116 @@
+
+
+<mat-expansion-panel [expanded]="true">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      WEEKLY VISITOR BIAS
+    </mat-panel-title>
+    <mat-panel-description>
+      Forecast activity as a decimal fraction for each day over a week
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+
+  <ng-container *ngTemplateOutlet="tmplListWeekly"></ng-container>
+
+</mat-expansion-panel>
+
+
+
+
+<ng-template #tmplEditWeekly>
+  <mat-card>
+    <h5>{{editState}}</h5>
+    <form novalidate #monthlyFm="ngForm">
+      <mat-form-field>
+        <input type="text"
+               name="name"
+               (ngModelChange)="modelChange($event)"
+               matInput
+               [(ngModel)]="editWeeklyVisitorBias.name">
+        <mat-hint>
+          name
+        </mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input type="text"
+               name="description"
+               (ngModelChange)="modelChange($event)"
+               matInput
+               [(ngModel)]="editWeeklyVisitorBias.description">
+        <mat-hint>
+          description
+        </mat-hint>
+      </mat-form-field>
+      <br>
+      <ng-container *ngFor="let itm of monthFlds; let i = index">
+        <mat-form-field>
+          <input type="text"
+                 [name]="input+itm"
+                 (ngModelChange)="modelChange($event)"
+                 matInput
+                 [(ngModel)]="editWeeklyVisitorBias[i+1]">
+          <mat-hint>
+            {{itm}}
+          </mat-hint>
+        </mat-form-field>
+      </ng-container>
+
+      <mat-toolbar class="mat-toolbar-conf">
+        <button mat-button
+                (click)="onDialogOK(false)"
+                class="cancel-button">CANCEL
+        </button>
+        <button
+                mat-raised-button
+                color="primary"
+                (click)="onDialogOK(true)">OK
+        </button>
+      </mat-toolbar>
+    </form>
+  </mat-card>
+</ng-template>
+
+
+<ng-template #tmplListWeekly>
+  <mat-card>
+    <form novalidate #monthlyFm="ngForm">
+
+
+      <ng-container *ngFor="let mnth of weeklyVisitorBias; let i = index">
+        {{mnth.name}} {{mnth.description}} <br>
+
+        <mat-toolbar>
+          <button mat-icon-button
+                  class="action-icon"
+                  matTooltip="edit"
+                  (click)="onEditClicked(mnth)">
+            <mat-icon class="action-icon">create</mat-icon>
+          </button>
+          <button mat-icon-button
+                  class="action-icon"
+                  matTooltip="duplicat"
+                  (click)="onEditClicked(mnth, true)">
+            <mat-icon class="action-icon">content_copy</mat-icon>
+          </button>
+          <button mat-icon-button
+                  class="action-icon"
+                  matTooltip="create"
+                  (click)="onEditClicked()">
+            <mat-icon class="action-icon">add</mat-icon>
+          </button>
+          <button mat-icon-button
+                  matTooltip="Delete"
+                  color="primary"
+                  (click)="onRemoveClicked(i)">
+            <mat-icon class="action-icon">remove</mat-icon>
+          </button>
+
+        </mat-toolbar>
+
+      </ng-container>
+    </form>
+  </mat-card>
+</ng-template>
+
+

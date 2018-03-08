@@ -7,7 +7,9 @@ import {FormsModule} from '@angular/forms';
 import {SettingEditComponent} from './setting-edit/setting-edit.component';
 import {MAT_DIALOG_DATA, MAT_DIALOG_DEFAULT_OPTIONS, MatDialogRef} from '@angular/material';
 import {ConfirmDeleteDialogComponent} from '../components/confirm-delete-dialog/confirm-delete-dialog.component';
-import { VistorCfgComponent } from './visitor-cfg/vistor-cfg/vistor-cfg.component';
+import {VistorMonthlyComponent} from './visitor-heuristic/vistor-monthly/vistor-monthly.component';
+import {VisitorWeeklyComponent} from './visitor-heuristic/visitor-weekly/visitor-weekly.component';
+import {OperatingCostsComponent} from './operating-costs/operating-costs.component';
 
 const route: Routes = [
     {path: 'settings', component: SettingsComponent}
@@ -24,15 +26,20 @@ const route: Routes = [
     declarations: [
         SettingsComponent,
         SettingEditComponent,
-        VistorCfgComponent,
+        VistorMonthlyComponent,
         ConfirmDeleteDialogComponent,
+        VisitorWeeklyComponent,
+        OperatingCostsComponent,
 
     ],
     entryComponents: [SettingEditComponent, ConfirmDeleteDialogComponent],
-    exports: [SettingsComponent, VistorCfgComponent],
+    exports: [SettingsComponent,
+        VistorMonthlyComponent,
+        VisitorWeeklyComponent,
+        OperatingCostsComponent],
     providers: [
-        { provide: MatDialogRef, useValue: {} },
-        { provide: MAT_DIALOG_DATA, useValue: [] },
+        {provide: MatDialogRef, useValue: {}},
+        {provide: MAT_DIALOG_DATA, useValue: []},
 
     ]
 })

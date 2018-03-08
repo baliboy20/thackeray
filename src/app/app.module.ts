@@ -13,6 +13,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ToDoModule} from './to-do/to-do.module';
 import {WhatifComponent} from './whatif/whatif.component';
 import {ConfigureModule} from './configure/configure.module';
+import { VisitorWeeklyComponent } from './visitor-heuristic/visitor-weekly/visitor-weekly.component';
 
 const appRoutes: Routes = [
     // {path: 'whatif', loadChildren: './whatif/whatif.module#WhatifModule' },
@@ -21,6 +22,7 @@ const appRoutes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
+    VisitorWeeklyComponent,
 
 
   ],

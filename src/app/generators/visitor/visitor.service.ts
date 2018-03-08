@@ -47,10 +47,10 @@ export class VisitorService {
         MONTHLY_VISITOR_BIAS: 'MonthlyVisitorBias',
         WEEKLY_VISITOR_BIAS: 'WeeklyVisitorBias',
         ASSUMPTIONS: 'thackSettings',
-    }
+        OPERATING_COSTS: 'operatingCosts'
+    };
 
     getForecast(from1: string, to: string, interval1: string, forecastmodel?: any) {
-
         return ForecastModelBasic.baseModel(from1, to, interval1);
     }
 
@@ -64,40 +64,68 @@ export class VisitorService {
         return StoreLocalSettings.retrieve(key);
     }
 
-    retrieveTemporalBiases() :[MonthlyVisitorBias[], WeeklyVisitorBias[]] {
+    retrieveOperationgCosts() {
+        return StoreLocalSettings.retrieve(this.key.OPERATING_COSTS);
+    }
 
-        return [StoreLocalSettings.retrieve( this.key.MONTHLY_VISITOR_BIAS),
+    retrieveTemporalBiases(): [MonthlyVisitorBias[], WeeklyVisitorBias[]] {
+
+        return [StoreLocalSettings.retrieve(this.key.MONTHLY_VISITOR_BIAS),
             StoreLocalSettings.retrieve(this.key.WEEKLY_VISITOR_BIAS)];
     };
 
-    persistAssuptions(assumps: any) {
-
-        const key = '';
+    persistAssumptions(assumps: any) {
         StoreLocalSettings.save(assumps, this.key.ASSUMPTIONS);
     }
 
-    applyAssumption(assum) {
-        ForecastModelBasic.fixedCostAssumptions =(assum);
+    getCurrentOperatingCosts() {
+        return ForecastModelBasic.operatingCosts;
+    }
+
+    getCurrentBiases(): [MonthlyVisitorBias, WeeklyVisitorBias] {
+        return [ForecastModelBasic.monthlyVisitorBias, ForecastModelBasic.weeklyVisitorBias];
     }
 
     getCurrentAssumptions() {
         return ForecastModelBasic.fixedCostAssumptions;
     }
 
-    getCurrentBiases():[MonthlyVisitorBias, WeeklyVisitorBias] {
-        return [ForecastModelBasic.monthlyVisitorBias, ForecastModelBasic.weeklyVisitorBias]
+    applyAssumption(assum) {
+        ForecastModelBasic.fixedCostAssumptions = (assum);
     }
+
     applyCurrentBiases(value: [MonthlyVisitorBias, WeeklyVisitorBias]) {
         ForecastModelBasic.monthlyVisitorBias = value[0];
-        ForecastModelBasic.weeklyVisitorBias = value[1];
+        // ForecastModelBasic.weeklyVisitorBias = value[1];
     }
+
+    applyCurrentWeeklyBias(value: WeeklyVisitorBias) {
+        ForecastModelBasic.weeklyVisitorBias = value;
+
+    }
+
+    applyCurrentMonthlyBias(value: MonthlyVisitorBias) {
+        ForecastModelBasic.monthlyVisitorBias = value;
+
+    }
+
+    applyOperatingCosts(value: OperatingCosts) {
+        ForecastModelBasic.operatingCosts = value;
+
+    }
+
+
     persistWeekyBias(values: WeeklyVisitorBias[]) {
-        StoreLocalSettings.save(values, this.key.WEEKLY_VISITOR_BIAS)
+        StoreLocalSettings.save(values, this.key.WEEKLY_VISITOR_BIAS);
     }
 
     persistMonthlyBias(values: WeeklyVisitorBias[]) {
-        console.log('persist monthly bias', values)
-        StoreLocalSettings.save(values, this.key.MONTHLY_VISITOR_BIAS)
+        console.log('persist monthly bias', values);
+        StoreLocalSettings.save(values, this.key.MONTHLY_VISITOR_BIAS);
+    }
+
+    persistOperatingCosts(value) {
+        StoreLocalSettings.save(value, this.key.OPERATING_COSTS);
     }
 }
 
@@ -170,7 +198,6 @@ export interface FixedCosts {
 }
 
 
-
 const computeTotalCosts: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
     a.totalCosts = +(a.variableCosts + a.fixedCosts);
     a.profit = a.netSales - a.totalCosts;
@@ -214,7 +241,7 @@ export interface MonthlyVisitorBias {
     '12': number;
 }
 
-export const MONTHLY_VISITOR_BIAS = {
+export const MONTHLY_VISITOR_BIAS: MonthlyVisitorBias = {
     description: 'Default config',
     name: 'DEFAULT',
     '1': .8,
@@ -243,7 +270,7 @@ export interface WeeklyVisitorBias {
     7: number;
 }
 
-const WEEKLY_VISITOR_BIAS = {
+export const WEEKLY_VISITOR_BIAS: WeeklyVisitorBias = {
     description: 'Default config',
     name: 'DEFAULT',
     '1': 1, // su
@@ -258,17 +285,19 @@ const WEEKLY_VISITOR_BIAS = {
 export interface OperatingCosts {
     staffPerDay: number,
     tradesBase: number,
-    rent: number,
+    // rent: number,
     averageSale: number,
-    serviceCharge: number
+    // serviceCharge: number
 }
 
 export const OPERATING_COSTS = {
+    name: 'Default Operating cost',
+    description: 'initial values',
     staffPerDay: 200,
     tradesBase: 210,
-    rent: 30000 / 12,
+    // rent: 30000 / 12,
     averageSale: 2.2,
-    serviceCharge: 3000 // per quarter
+    // serviceCharge: 3000 // per quarter
 };
 
 export const computeGroupOnPeriod = (a: any, b: string) => {
@@ -325,7 +354,7 @@ export class StoreLocalSettings {
     static retrieve(key: string) {
 
         const data = window.localStorage.getItem(key);
-        const dat =  JSON.parse(data);
+        const dat = JSON.parse(data);
         return dat;
     }
 }
@@ -337,6 +366,7 @@ export class StoreLocalSettings {
 export class ForecastModelBasic {
     static weeklyVisitorBias: WeeklyVisitorBias = WEEKLY_VISITOR_BIAS;
     static monthlyVisitorBias: MonthlyVisitorBias = MONTHLY_VISITOR_BIAS;
+    static operatingCosts: OperatingCosts = OPERATING_COSTS;
     static _fixedCostAssumptions: FixedCosts = new FixedCostsImpl() as FixedCosts;
 
     static set fixedCostAssumptions(value) {

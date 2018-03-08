@@ -2,16 +2,22 @@
 <div class="toolbar"></div>
 
 
-<mat-tab-group [selectedIndex]="'2'" >
+<mat-tab-group [selectedIndex]="'1'" >
 
   <mat-tab label="Fixed Costs" >
     <app-Fixed-costs></app-Fixed-costs>
   </mat-tab>
   <mat-tab label="Variable Costs" >
-
+     <mat-accordion>
+         <app-operating-costs></app-operating-costs>
+     </mat-accordion>
   </mat-tab>
   <mat-tab label="Visitor numbers" >
-    <app-vistor-cfg></app-vistor-cfg>
+    <mat-accordion>
+      <app-vistor-monthly></app-vistor-monthly>
+      <app-visitor-weekly></app-visitor-weekly>
+    </mat-accordion>
+
   </mat-tab>
 
 

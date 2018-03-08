@@ -4,11 +4,11 @@ import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
 import {ConfirmDeleteDialogComponent} from '../../../components/confirm-delete-dialog/confirm-delete-dialog.component';
 
 @Component({
-    selector: 'app-vistor-cfg',
-    templateUrl: './vistor-cfg.component.html',
-    styleUrls: ['./vistor-cfg.component.scss']
+    selector: 'app-vistor-monthly',
+    templateUrl: './vistor-monthly.component.html',
+    styleUrls: ['./vistor-monthly.component.scss']
 })
-export class VistorCfgComponent implements OnInit {
+export class VistorMonthlyComponent implements OnInit {
 
     @ViewChild('tmplEditMonthly') tmp: TemplateRef<any>;
     @ViewChild('tmplConfirmDelete') tmplConfirmDelete: TemplateRef<any>;

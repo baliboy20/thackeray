@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VistorCfgComponent } from './vistor-cfg.component';
+import { VistorMonthlyComponent } from './vistor-monthly.component';
 
 describe('VistorCfgComponent', () => {
-  let component: VistorCfgComponent;
-  let fixture: ComponentFixture<VistorCfgComponent>;
+  let component: VistorMonthlyComponent;
+  let fixture: ComponentFixture<VistorMonthlyComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ VistorCfgComponent ]
+      declarations: [ VistorMonthlyComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(VistorCfgComponent);
+    fixture = TestBed.createComponent(VistorMonthlyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
