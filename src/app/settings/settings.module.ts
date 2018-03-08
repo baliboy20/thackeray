@@ -5,8 +5,9 @@ import {RouterModule, Routes} from '@angular/router';
 import {MaterialsModule} from '../../materials/materials.module';
 import {FormsModule} from '@angular/forms';
 import {SettingEditComponent} from './setting-edit/setting-edit.component';
-import {MAT_DIALOG_DATA, MAT_DIALOG_DEFAULT_OPTIONS} from '@angular/material';
+import {MAT_DIALOG_DATA, MAT_DIALOG_DEFAULT_OPTIONS, MatDialogRef} from '@angular/material';
 import {ConfirmDeleteDialogComponent} from '../components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { VistorCfgComponent } from './visitor-cfg/vistor-cfg/vistor-cfg.component';
 
 const route: Routes = [
     {path: 'settings', component: SettingsComponent}
@@ -23,12 +24,17 @@ const route: Routes = [
     declarations: [
         SettingsComponent,
         SettingEditComponent,
+        VistorCfgComponent,
         ConfirmDeleteDialogComponent,
+
     ],
     entryComponents: [SettingEditComponent, ConfirmDeleteDialogComponent],
-    exports: [SettingsComponent]
-    // providers: [
-    //     {provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {hasBackdrop: false}, ]
+    exports: [SettingsComponent, VistorCfgComponent],
+    providers: [
+        { provide: MatDialogRef, useValue: {} },
+        { provide: MAT_DIALOG_DATA, useValue: [] },
+
+    ]
 })
 export class SettingsModule {
 }

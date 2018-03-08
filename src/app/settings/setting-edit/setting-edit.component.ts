@@ -30,19 +30,22 @@ export class SettingEditComponent implements OnInit {
 
     constructor(private ref: MatDialogRef<SettingEditComponent>,
                 @Inject(MAT_DIALOG_DATA) public data: any) {
-        console.log('mode', data);
         this.assumptions = data.cfg;
         this.mode = data.mode;
 
     }
 
-    onInvalid(e) { console.log('onInvalid event; ', e);}
+    protected onInvalid(e) { console.log('onInvalid event; ', e);}
     ngOnInit() {
     }
 
     onClose() {
         console.log('onclode', this.data, this.mode);
         this.ref.close();
+    }
+
+    read(){
+        return 'read';
     }
 
 }

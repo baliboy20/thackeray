@@ -28,6 +28,10 @@ import {of} from 'rxjs/observable/of';
 
 /**                 ************
  *                  CLASS VisitorService
+ *                  assumption are fixed costs
+ *                  biases for visitors
+ *                  persist to cache
+ *                  getCurrent is the cfg data presently being used
  *
  */
 @Injectable()
@@ -39,23 +43,37 @@ export class VisitorService {
     constructor() {
     }
 
+    key = {
+        MONTHLY_VISITOR_BIAS: 'MonthlyVisitorBias',
+        WEEKLY_VISITOR_BIAS: 'WeeklyVisitorBias',
+        ASSUMPTIONS: 'thackSettings',
+    }
+
     getForecast(from1: string, to: string, interval1: string, forecastmodel?: any) {
 
         return ForecastModelBasic.baseModel(from1, to, interval1);
     }
 
+    /** Actual forecast */
     getForecastGrouped(from1: string, to: string, gap: string, forecastmodel?: any) {
         return ForecastModelBasic.baseModelGrouped(from1, to, gap);
     }
 
     retrieveAssumptions() {
-        return StoreLocalSettings.retrieve();
+        const key = 'thackSettings';
+        return StoreLocalSettings.retrieve(key);
     }
 
-    persistAssuptions(assumps: any) {
-        // console.log('assumptions have been srt', assumps);
-        StoreLocalSettings.save(assumps);
+    retrieveTemporalBiases() :[MonthlyVisitorBias[], WeeklyVisitorBias[]] {
 
+        return [StoreLocalSettings.retrieve( this.key.MONTHLY_VISITOR_BIAS),
+            StoreLocalSettings.retrieve(this.key.WEEKLY_VISITOR_BIAS)];
+    };
+
+    persistAssuptions(assumps: any) {
+
+        const key = '';
+        StoreLocalSettings.save(assumps, this.key.ASSUMPTIONS);
     }
 
     applyAssumption(assum) {
@@ -64,6 +82,22 @@ export class VisitorService {
 
     getCurrentAssumptions() {
         return ForecastModelBasic.fixedCostAssumptions;
+    }
+
+    getCurrentBiases():[MonthlyVisitorBias, WeeklyVisitorBias] {
+        return [ForecastModelBasic.monthlyVisitorBias, ForecastModelBasic.weeklyVisitorBias]
+    }
+    applyCurrentBiases(value: [MonthlyVisitorBias, WeeklyVisitorBias]) {
+        ForecastModelBasic.monthlyVisitorBias = value[0];
+        ForecastModelBasic.weeklyVisitorBias = value[1];
+    }
+    persistWeekyBias(values: WeeklyVisitorBias[]) {
+        StoreLocalSettings.save(values, this.key.WEEKLY_VISITOR_BIAS)
+    }
+
+    persistMonthlyBias(values: WeeklyVisitorBias[]) {
+        console.log('persist monthly bias', values)
+        StoreLocalSettings.save(values, this.key.MONTHLY_VISITOR_BIAS)
     }
 }
 
@@ -135,29 +169,7 @@ export interface FixedCosts {
     lease: { amount: number, frequency: string, dayDue: number };
 }
 
-// @Deprecated
-// const computeFixedCosts: (arg: VisitorSequent) => CostSalesSequent = (arg: VisitorSequent) => {
-//     const f = ForecastModelBasic.dec2;
-//     const v: number[] = [3, 6, 9, 12];
-//     const fc: CostSalesSequent = arg as CostSalesSequent;
-//     const ohds = (v.includes(arg.month) && moment(arg.date).format('D') === '1') ? OPERATING_COSTS.serviceCharge : 0;
-//     const rent = moment(arg.date).format('D') === '1' ? OPERATING_COSTS.rent : 0;
-//     const staff = OPERATING_COSTS.staffPerDay;
-//     fc.fixedCosts = +(ohds + staff + rent).toPrecision(2);
-//     fc.cumVat = 0;
-//     fc.cumProfit = 0;
-//     fc.cashflow = 0;
-//     fc.cumCosts = 0;
-//     fc.profit = 0;
-//     return fc;
-// };
 
-// const computeVariableCosts: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
-//     if(a) throw new Error('const computeVariableCosts: old program');
-//     a.variableCosts = +((a as VisitorSequent).trades *
-//         OPERATING_COSTS.averageSale * .33);
-//     return a;
-// };
 
 const computeTotalCosts: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
     a.totalCosts = +(a.variableCosts + a.fixedCosts);
@@ -185,39 +197,9 @@ const computeCumTotals: (a: CostSalesSequent, b: CostSalesSequent, i: number) =>
         return curr;
     };
 
-// const computeNetSales: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
-//     a.netSales = (a as VisitorSequent).trades *
-//         OPERATING_COSTS.averageSale;
-//     a.vatOnSales = (a as VisitorSequent).trades *
-//         OPERATING_COSTS.averageSale * .2;
-//     // console.log("xxxii", OperatingCosts.averageSale, a.trades);
-//     return a;
-// };
-
-// Grouped computes
-// const computeGroupedValues = (key) => {
-//     return reduce((acc: CostSalesSequent, curr: CostSalesSequent, idx) => {
-//         if (idx === 0) {
-//             acc.trades = 0;
-//             acc.profit = 0;
-//             acc.vatOnSales = 0;
-//             acc.variableCosts = 0;
-//             acc.vatOnSales = 0;
-//             acc.netSales = 0;
-//         } else {
-//             acc.trades += curr.trades;
-//             acc.profit += curr.profit;
-//             acc.vatOnSales += curr.vatOnSales;
-//             acc.variableCosts += curr.variableCosts;
-//             acc.netSales += curr.netSales;
-//         }
-//         acc.date = key;
-//         return acc;
-//     }, {} as CostSalesSequent);
-// };
-
 export interface MonthlyVisitorBias {
     description: string;
+    name: string;
     '1': number;
     '2': number;
     '3': number;
@@ -232,8 +214,9 @@ export interface MonthlyVisitorBias {
     '12': number;
 }
 
-const MONTHLY_VISITOR_BIAS = {
+export const MONTHLY_VISITOR_BIAS = {
     description: 'Default config',
+    name: 'DEFAULT',
     '1': .8,
     '2': 1,
     '3': 1.02,  // mar
@@ -250,6 +233,7 @@ const MONTHLY_VISITOR_BIAS = {
 
 export interface WeeklyVisitorBias {
     description: string;
+    name: string;
     1: number;
     2: number;
     3: number;
@@ -261,6 +245,7 @@ export interface WeeklyVisitorBias {
 
 const WEEKLY_VISITOR_BIAS = {
     description: 'Default config',
+    name: 'DEFAULT',
     '1': 1, // su
     '2': .5, // mo
     '3': .8, // tu
@@ -332,15 +317,15 @@ export class FixedCostsImpl implements FixedCosts {
 export class StoreLocalSettings {
     static settingName = 'thackSettings';
 
-    static save(value: any[]) {
+    static save(value: any[], key: string) {
         const str = JSON.stringify(value);
-        window.localStorage.setItem(StoreLocalSettings.settingName, str);
+        window.localStorage.setItem(key, str);
     }
 
-    static retrieve() {
+    static retrieve(key: string) {
 
-        const data = window.localStorage.getItem(StoreLocalSettings.settingName);
-        const dat = data === null ? new FixedCostsImpl() : JSON.parse(data);
+        const data = window.localStorage.getItem(key);
+        const dat =  JSON.parse(data);
         return dat;
     }
 }

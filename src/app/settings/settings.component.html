@@ -1,15 +1,21 @@
 <div class="spacer"></div>
 <div>
-    <mat-toolbar>
-        <button mat-icon-button (click)="openDialog()"> <mat-icon>add</mat-icon></button>
-        <button mat-icon-button (click)="refreshClicked" matTooltip="refresh"> <mat-icon>cached</mat-icon></button>
-    </mat-toolbar>
+
 </div>
 
 
 
 <mat-card>
-    <mat-card-title>List of Configurations for Fixed Costs</mat-card-title>
+    <mat-card-title>FIXED COSTS</mat-card-title>
+    <mat-toolbar>
+        <mat-select placeholder="Choose Fixed Configuration">
+            <!--<mat-option *ngFor="['one','two', 'three']">{{item}}</mat-option>-->
+            <mat-option>Domestic law</mat-option>
+            <mat-option>Domestic dog</mat-option>
+        </mat-select>
+        <button mat-icon-button (click)="openDialog()"> <mat-icon>add</mat-icon></button>
+        <button mat-icon-button (click)="refreshClicked" matTooltip="refresh"> <mat-icon>cached</mat-icon></button>
+    </mat-toolbar>
 <table class="cfg-record">
     <ng-container *ngFor="let it of assumptions">
         <tr>

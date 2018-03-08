@@ -1,0 +1,19 @@
+td {
+  padding: 9px;
+}
+
+.mat-toolbar-conf {
+  background-color: white;
+  margin-top: 20px;
+}
+
+.action-icon {
+  font-size: 14px;
+  &:hover{
+    color: darken(crimson, 15%);
+  }
+}
+.cancel-button {
+  color: lighten(crimson, 10%);
+  margin-right: 30px;
+}

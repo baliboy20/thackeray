@@ -1,0 +1,163 @@
+<mat-accordion>
+    <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Weekly Visitor Bias
+            </mat-panel-title>
+            <mat-panel-description>
+                Forecast activity as a decimal fraction for each day over a week
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium aspernatur blanditiis debitis eaque ex
+        impedit in labore molestias nisi nulla, odio omnis repudiandae suscipit, velit voluptatum! Dolore doloremque
+        illo quibusdam.
+    </mat-expansion-panel>
+
+    <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Monthly Visitor Bias
+            </mat-panel-title>
+            <mat-panel-description>
+                Forecast activity as a decimal fraction for each day over a week
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <ng-container *ngTemplateOutlet="tmplListMonthly"></ng-container>
+
+    </mat-expansion-panel>
+
+</mat-accordion>
+
+
+<ng-template #tmplEditMonthly>
+    <mat-card>
+        <h5>{{editState}}</h5>
+        <form novalidate #monthlyFm="ngForm">
+            <mat-form-field>
+                <input type="text"
+                       name="name"
+                       (ngModelChange)="modelChange($event)"
+                       matInput
+                       [(ngModel)]="editMonthlyVisitorBias.name">
+                <mat-hint>
+                    name
+                </mat-hint>
+            </mat-form-field>
+
+            <mat-form-field>
+                <input type="text"
+                       name="description"
+                       (ngModelChange)="modelChange($event)"
+                       matInput
+                       [(ngModel)]="editMonthlyVisitorBias.description">
+                <mat-hint>
+                    description
+                </mat-hint>
+            </mat-form-field>
+            <br>
+            <ng-container *ngFor="let itm of monthFlds; let i = index">
+                <mat-form-field>
+                    <input type="text"
+                           [name]="input+itm"
+                           (ngModelChange)="modelChange($event)"
+                           matInput
+                           [(ngModel)]="editMonthlyVisitorBias[i+1]">
+                    <mat-hint>
+                        {{itm}}
+                    </mat-hint>
+                </mat-form-field>
+            </ng-container>
+
+            <mat-toolbar class="mat-toolbar-conf">
+                <button mat-button
+                        (click)="onDialogOK(false)"
+                        class="cancel-button">CANCEL
+                </button>
+                <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="onDialogOK(true)">OK
+                </button>
+            </mat-toolbar>
+        </form>
+    </mat-card>
+</ng-template>
+
+
+<ng-template #tmplListMonthly>
+    <mat-card>
+        <form novalidate #monthlyFm="ngForm">
+
+
+            <ng-container *ngFor="let mnth of monthlyVisitorBias; let i = index">
+                {{mnth.name}} {{mnth.description}} <br>
+                <!--<mat-form-field>-->
+                    <!--<input type="text"-->
+                           <!--name="name"-->
+                           <!--readonly-->
+                           <!--matInput-->
+                           <!--[ngModel]="mnth.name">-->
+                    <!--<mat-hint>-->
+                        <!--name-->
+                    <!--</mat-hint>-->
+                <!--</mat-form-field>-->
+                <mat-toolbar>
+                    <button mat-icon-button
+                            class="action-icon"
+                            matTooltip="edit"
+                            (click)="onEditClicked(mnth)">
+                        <mat-icon class="action-icon">create</mat-icon>
+                    </button>
+                    <button mat-icon-button
+                            class="action-icon"
+                            matTooltip="duplicat"
+                            (click)="onEditClicked(mnth, true)">
+                        <mat-icon class="action-icon">content_copy</mat-icon>
+                    </button>
+                    <button mat-icon-button
+                            class="action-icon"
+                            matTooltip="create"
+                            (click)="onEditClicked()">
+                        <mat-icon class="action-icon">add</mat-icon>
+                    </button>
+                    <button mat-icon-button
+                            matTooltip="Delete"
+                            color="primary"
+                            (click)="onRemoveClicked(i)">
+                        <mat-icon class="action-icon">remove</mat-icon>
+                    </button>
+
+                </mat-toolbar>
+                <!--<mat-form-field>-->
+                    <!--<input type="text"-->
+                           <!--name="description"-->
+                           <!--readonly-->
+                           <!--matInput-->
+                           <!--[ngModel]="mnth.description">-->
+                    <!--<mat-hint>-->
+                        <!--description-->
+                    <!--</mat-hint>-->
+                <!--</mat-form-field>-->
+                <!--<br>-->
+
+                <!--<ng-container *ngFor="let itm of monthFlds; let i = index">-->
+                    <!--<mat-form-field>-->
+                        <!--<input type="text"-->
+                               <!--[name]="input+itm"-->
+                               <!--readonly-->
+                               <!--matInput-->
+                               <!--[ngModel]="mnth[i+1]">-->
+                        <!--<mat-hint>-->
+                            <!--{{itm}}-->
+                        <!--</mat-hint>-->
+                    <!--</mat-form-field>-->
+                <!--</ng-container>-->
+            </ng-container>
+        </form>
+    </mat-card>
+</ng-template>
+
+<ng-template #tmplConfirmDelete>
+    <mat-card></mat-card>
+</ng-template>

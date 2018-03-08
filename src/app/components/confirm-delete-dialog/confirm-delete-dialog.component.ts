@@ -25,7 +25,7 @@ export class ConfirmDeleteDialogComponent implements OnInit {
 
     onClose() {
         // this.ref.close();
-        console.log('closoed clicked');
+        //console.lo  g('closoed clicked');
     }
 
 }

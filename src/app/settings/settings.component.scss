@@ -32,3 +32,22 @@
   padding: 140px;
 
 }
+
+mat-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+mat-card-title {
+  color: lighten(black, 10%);
+  font-size: 18px;
+  font-family: Chalkboard;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+mat-select {
+  width: 200px;
+  color: darken(black, 0%);
+  font-size: 14px;
+}

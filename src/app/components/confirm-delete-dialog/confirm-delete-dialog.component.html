@@ -11,7 +11,7 @@
 
   <button mat-button
           style="margin-right: 20px; color: crimson"
-          (click)="onClose()">
+          [mat-dialog-close]="{status:'deleteCancelled'}">
     CANCEL
   </button>
   <button mat-raised-button
