@@ -127,6 +127,10 @@ export class VisitorService {
     persistOperatingCosts(value) {
         StoreLocalSettings.save(value, this.key.OPERATING_COSTS);
     }
+
+    test(value){
+        console.log('ZS called', value);
+    }
 }
 
 /**                         *********
@@ -370,7 +374,7 @@ export class ForecastModelBasic {
     static _fixedCostAssumptions: FixedCosts = new FixedCostsImpl() as FixedCosts;
 
     static set fixedCostAssumptions(value) {
-        this.fixedCostAssumptions = value;
+        this._fixedCostAssumptions = value;
     }
 
     static get fixedCostAssumptions() {
@@ -626,7 +630,7 @@ export class ForecastModelBasic {
     static baseModel(from1: string = '02/01/2018', to: string = '26/01/2018',
                      gap: string = 'day'): Observable<CostSalesSequent> {
         const fc = ForecastModelBasic;
-        const fixc = new FixedCostsImpl();
+        const fixc = this.fixedCostAssumptions;
         const wvb = fc.weeklyVisitorBias;
         const mvb = fc.monthlyVisitorBias;
 

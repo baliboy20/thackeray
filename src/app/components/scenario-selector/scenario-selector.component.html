@@ -1,0 +1,8 @@
+<mat-form-field>
+  <mat-select (selectionChange)="selectionChanged($event)">
+    <mat-option *ngFor="let sc of scenes" [value]="sc">
+      {{sc[labelName]}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+

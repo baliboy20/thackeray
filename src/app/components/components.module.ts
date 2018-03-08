@@ -5,6 +5,8 @@ import { AggPeriodComponent } from './agg-period/agg-period.component';
 import {NumFmtPipe} from './pipes/num-fmt.pipe';
 import {DateAdapter, MAT_DATE_FORMATS} from '@angular/material';
 import {APP_DATE_FORMATS, AppDateAdapter} from './providers/MaterialDateAdapterProvider';
+import { ScenarioSelectorComponent } from './scenario-selector/scenario-selector.component';
+import {MaterialsModule} from '../../materials/materials.module';
 
 /**
  * related post:
@@ -14,10 +16,18 @@ import {APP_DATE_FORMATS, AppDateAdapter} from './providers/MaterialDateAdapterP
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+      MaterialsModule,
   ],
-  declarations: [DailyComponent, AggPeriodComponent, NumFmtPipe],
-  exports: [DailyComponent, AggPeriodComponent],
+  declarations: [
+      DailyComponent,
+      AggPeriodComponent,
+      NumFmtPipe,
+      ScenarioSelectorComponent
+  ],
+  exports: [DailyComponent,
+      AggPeriodComponent,
+      ScenarioSelectorComponent],
     providers: [
         {
             provide: DateAdapter, useClass: AppDateAdapter

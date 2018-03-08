@@ -40,7 +40,19 @@
                         <button mat-raised-button color="primary" (click)="onRecompute()">COMPUTE</button>
                         <br>
                     </form>
+                   <!--
+                   applyFuncName = 'applyAssumption';
+    @Input() retrieveFuncName = 'retrieveAssumptions';
+    @Input() labelName = 'name';
 
+
+                   -->
+                    <app-scenario-selector
+                            placeholder = "Choose Scenes"
+                            [applyFuncName] = "'applyAssumption'"
+                            [retrieveFuncName] = "'retrieveAssumptions'"
+                            [labelName] = "'configName'">
+                    </app-scenario-selector>
                 </mat-card>
             </mat-tab>
             <mat-tab label="layout view"></mat-tab>

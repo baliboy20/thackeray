@@ -67,7 +67,7 @@
     <h3>{{fname}}</h3>
 
     <mat-form-field>
-        <input type="text"
+        <input type="number"
                matInput
                #amount="ngModel"
                required
@@ -76,7 +76,7 @@
         <mat-hint>Amount to be paid</mat-hint>
     </mat-form-field>
     <mat-form-field>
-        <input type="text"
+        <input type="number"
                matInput
                [(ngModel)]="ob.dayDue"
                name="datDue">
