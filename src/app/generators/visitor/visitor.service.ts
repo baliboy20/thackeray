@@ -43,7 +43,7 @@ export class VisitorService {
     constructor() {
     }
 
-    key = {
+    static key = {
         MONTHLY_VISITOR_BIAS: 'MonthlyVisitorBias',
         WEEKLY_VISITOR_BIAS: 'WeeklyVisitorBias',
         ASSUMPTIONS: 'thackSettings',
@@ -65,17 +65,25 @@ export class VisitorService {
     }
 
     retrieveOperationgCosts() {
-        return StoreLocalSettings.retrieve(this.key.OPERATING_COSTS);
+        return StoreLocalSettings.retrieve(VisitorService.key.OPERATING_COSTS);
     }
 
     retrieveTemporalBiases(): [MonthlyVisitorBias[], WeeklyVisitorBias[]] {
 
-        return [StoreLocalSettings.retrieve(this.key.MONTHLY_VISITOR_BIAS),
-            StoreLocalSettings.retrieve(this.key.WEEKLY_VISITOR_BIAS)];
+        return [StoreLocalSettings.retrieve(VisitorService.key.MONTHLY_VISITOR_BIAS),
+            StoreLocalSettings.retrieve(VisitorService.key.WEEKLY_VISITOR_BIAS)];
+    };
+
+    retrieveCurrentMonthlyBias(): MonthlyVisitorBias[] {
+        return StoreLocalSettings.retrieve(VisitorService.key.MONTHLY_VISITOR_BIAS);
+    };
+
+    retrieveCurrentWeeklyBias(): WeeklyVisitorBias[] {
+        return StoreLocalSettings.retrieve(VisitorService.key.WEEKLY_VISITOR_BIAS);
     };
 
     persistAssumptions(assumps: any) {
-        StoreLocalSettings.save(assumps, this.key.ASSUMPTIONS);
+        StoreLocalSettings.save(assumps, VisitorService.key.ASSUMPTIONS);
     }
 
     getCurrentOperatingCosts() {
@@ -116,21 +124,18 @@ export class VisitorService {
 
 
     persistWeekyBias(values: WeeklyVisitorBias[]) {
-        StoreLocalSettings.save(values, this.key.WEEKLY_VISITOR_BIAS);
+        StoreLocalSettings.save(values, VisitorService.key.WEEKLY_VISITOR_BIAS);
     }
 
     persistMonthlyBias(values: WeeklyVisitorBias[]) {
         console.log('persist monthly bias', values);
-        StoreLocalSettings.save(values, this.key.MONTHLY_VISITOR_BIAS);
+        StoreLocalSettings.save(values, VisitorService.key.MONTHLY_VISITOR_BIAS);
     }
 
     persistOperatingCosts(value) {
-        StoreLocalSettings.save(value, this.key.OPERATING_COSTS);
+        StoreLocalSettings.save(value, VisitorService.key.OPERATING_COSTS);
     }
 
-    test(value){
-        console.log('ZS called', value);
-    }
 }
 
 /**                         *********
@@ -139,6 +144,11 @@ export class VisitorService {
 
 
 export interface CostSalesSequent extends VisitorSequent {
+    salaries: number;
+    rent: number;
+    leased: number;
+    serviceCharge: number;
+    rates: number;
     fixedCosts: number;
     variableCosts: number;
     netSales: number;
@@ -374,6 +384,7 @@ export class ForecastModelBasic {
     static _fixedCostAssumptions: FixedCosts = new FixedCostsImpl() as FixedCosts;
 
     static set fixedCostAssumptions(value) {
+        // console.log('setting operationg costs', value);
         this._fixedCostAssumptions = value;
     }
 
@@ -406,6 +417,11 @@ export class ForecastModelBasic {
         return moment(date).quarter() * 1000 + dayOfYr;
     }
 
+    /*******************************************************************************************
+     *
+     * COMPUTUERS
+     *
+     ********************************************************************************************/
     static computeTotalCosts: (a: CostSalesSequent) => CostSalesSequent = (a: CostSalesSequent) => {
         a.totalCosts = a.variableCosts + a.fixedCosts;
         a.profit = a.netSales - a.totalCosts;
@@ -457,16 +473,17 @@ export class ForecastModelBasic {
     static computeRunningTotals(prev: CostSalesSequent, curr: CostSalesSequent, idx) {
 
         if (idx === 0) {
+            console.log('PREV', prev, curr)
             prev.cumProfit = prev.profit;
             prev.cumTotalSales = prev.netSales;
             prev.cumVat = prev.vatOnSales;
             prev.cumTotalCosts = prev.totalCosts;
 
-            curr.cumProfit = curr.profit;
-            curr.cumVat = curr.vatOnSales;
-            curr.cumTotalCosts = curr.totalCosts;
-            curr.cumTotalSales = curr.netSales;
-            console.log('cum pr', curr.cumProfit);
+            curr.cumProfit = curr.profit + prev.cumProfit;
+            curr.cumVat = curr.vatOnSales + prev.cumVat;
+            curr.cumTotalCosts = curr.totalCosts + prev.cumTotalCosts;
+            curr.cumTotalSales = curr.netSales + prev.cumTotalSales;
+            //console.log('cum pr', curr.cumProfit);
         } else {
             curr.cumProfit = prev.cumProfit + curr.profit;
             curr.cumVat = prev.cumVat + curr.vatOnSales;
@@ -477,7 +494,9 @@ export class ForecastModelBasic {
     };
 
 
-    /** */
+    /**         -----------------
+                computeFixedCosts
+     */
     static computeFixedCosts(arg: DateSequent, fco: FixedCosts) {
         const dec2 = ForecastModelBasic.dec2;
         const v: number[] = [4, 7, 10, 1];
@@ -601,9 +620,11 @@ export class ForecastModelBasic {
         return a;
     };
 
-    /**                        *********
-     *                          VisitorSequentFactory1
-     */
+    /*******************************************************************************************
+     *
+     * FACTORIES
+     *
+     ********************************************************************************************/
     static visitorSequentFactory1(ds: DateSequent, tradeBase,
                                   weeklyVisitorBias1: WeeklyVisitorBias,
                                   mvb: MonthlyVisitorBias): VisitorSequent {
@@ -626,20 +647,26 @@ export class ForecastModelBasic {
         } as VisitorSequent);
     }
 
-    /** */
+    /*******************************************************************************************
+     *
+     * SIMULATIONS
+     *
+     ********************************************************************************************/
     static baseModel(from1: string = '02/01/2018', to: string = '26/01/2018',
                      gap: string = 'day'): Observable<CostSalesSequent> {
         const fc = ForecastModelBasic;
         const fixc = this.fixedCostAssumptions;
         const wvb = fc.weeklyVisitorBias;
         const mvb = fc.monthlyVisitorBias;
-
+        const tb = fc.operatingCosts.tradesBase;
+        const avsale = fc.operatingCosts.averageSale;
         return this.fromDateObservable(from1, to, gap)
-            .map((a: DateSequent) => ForecastModelBasic.visitorSequentFactory1(a, 100, wvb, mvb))
+
+            .map((a: DateSequent) => ForecastModelBasic.visitorSequentFactory1(a, tb, wvb, mvb))
             .map(a => (a as CostSalesSequent))
             .map(a => fc.computeFixedCosts(a, fixc))
             .map(a => fc.computeVariableCosts(a))
-            .map(a => fc.computeNetSales(a, 2.2))
+            .map(a => fc.computeNetSales(a, avsale))
             .map(a => fc.computeTotalCosts(a))
             .scan(fc.computeRunningTotals);
     }
@@ -651,14 +678,16 @@ export class ForecastModelBasic {
         const fixc = new FixedCostsImpl();
         const wvb = fc.weeklyVisitorBias;
         const mvb = fc.monthlyVisitorBias;
+        const tb = fc.operatingCosts.tradesBase;
+        const avsale = fc.operatingCosts.averageSale;
 
         return this.fromDateObservable(from1, to, gap)
-            .map((a: DateSequent) => ForecastModelBasic.visitorSequentFactory1(a, 100, wvb, mvb))
+            .map((a: DateSequent) => ForecastModelBasic.visitorSequentFactory1(a, tb, wvb, mvb))
             .map(a => (a as CostSalesSequent))
             .map(a => fc.computeVariableCosts(a))
             .map(a => fc.computeFixedCosts(a, fixc))
             .map(a => fc.computeVariableCosts(a))
-            .map(a => fc.computeNetSales(a, 2.2))
+            .map(a => fc.computeNetSales(a, avsale))
             .map(a => fc.computeTotalCosts(a))
             .scan(fc.computeRunningTotals)
             .groupBy(a => fc.computeGroupOnPeriod(a, gap))
