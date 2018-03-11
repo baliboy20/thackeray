@@ -55,7 +55,12 @@ export class WhatifComponent implements OnInit {
             null)
             .toArray()
             .subscribe(a => this.data$.next(a));
+    }
 
+    ngAfterViewInit() {
+        setTimeout(() => {
+            this.toggle();
+        }, 10);
     }
 
     toggle() {

@@ -6,20 +6,17 @@ import * as assert from 'assert';
 import {isNull} from 'util';
 
 @Component({
-  selector: 'app-visitor-weekly',
-  templateUrl: './visitor-weekly.component.html',
-  styleUrls: ['./visitor-weekly.component.scss']
+    selector: 'app-visitor-weekly',
+    templateUrl: './visitor-weekly.component.html',
+    styleUrls: ['./visitor-weekly.component.scss']
 })
 export class VisitorWeeklyComponent implements OnInit {
 
     @ViewChild('tmplEditWeekly') tmp: TemplateRef<any>;
     @ViewChild('tmplConfirmDelete') tmplConfirmDelete: TemplateRef<any>;
 
-
-    // private currMonthlyVisitorBias: MonthlyVisitorBias;
-    // private editMonthlyVisitorBias: MonthlyVisitorBias;
     private currWeeklyVisitorBias: WeeklyVisitorBias;
-    private weeklyVisitorBias: WeeklyVisitorBias[] = [ ];
+    private weeklyVisitorBias: WeeklyVisitorBias[] = [];
     private editWeeklyVisitorBias: WeeklyVisitorBias;
     private editState = 'EDIT_REC';
     private monthFlds = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
@@ -33,8 +30,7 @@ export class VisitorWeeklyComponent implements OnInit {
 
     ngOnInit() {
         const [m, w] = this.service.retrieveTemporalBiases();
-        console.log('weekly vb', w, isNull(w),w.length);
-        if(isNull(w) || w.length === 0) {
+        if (isNull(w) || w.length === 0) {
             this.weeklyVisitorBias.push(Object.assign({}, WEEKLY_VISITOR_BIAS));
         } else {
             this.weeklyVisitorBias = w;
@@ -53,23 +49,19 @@ export class VisitorWeeklyComponent implements OnInit {
     }
 
     onEditClicked(value, dup?: false) {
-        console.log('on edit clicked', value);
 
         if (value === undefined) {
             this.editWeeklyVisitorBias = Object.assign({}, WEEKLY_VISITOR_BIAS);
             this.editState = 'NEW_REC';
 
-        } else if(!dup){
-            this.editWeeklyVisitorBias =  value ;
+        } else if (!dup) {
+            this.editWeeklyVisitorBias = value;
             this.editState = 'EDIT_REC';
         } else {
 
-            this.editWeeklyVisitorBias =  Object.assign({}, value);
-            console.log('assigning')
+            this.editWeeklyVisitorBias = Object.assign({}, value);
             this.editState = 'NEW_REC';
         }
-
-
 
         this.ref = this.dialog.open(this.tmp, {});
         this.ref.afterClosed().subscribe(a => {
@@ -93,18 +85,13 @@ export class VisitorWeeklyComponent implements OnInit {
     }
 
     onRemoveClicked(idx: number) {
-        console.log('The idx is', this.weeklyVisitorBias[idx], idx);
-        // const cfg = {data:{name: 'charles'} };
-        const cfg = {data:{name: this.weeklyVisitorBias[idx].name} }
-        const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, cfg );
+        const cfg = {data: {name: this.weeklyVisitorBias[idx].name}};
+        const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, cfg);
         dialogRef.afterClosed().subscribe(a => {
-            console.log('after closed', a);
             if (a.status === 'deleteConfirmed') {
                 this.weeklyVisitorBias.splice(idx, 1);
                 this.service.persistWeekyBias(this.weeklyVisitorBias);
             }
         });
     }
-
-
 }

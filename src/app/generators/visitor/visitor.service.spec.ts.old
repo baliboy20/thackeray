@@ -32,8 +32,8 @@ describe('VisitorService', () => {
     ];
     let s: Subject<DateSequent> = new Subject();
     // const wvb: WeeklyVisitorBias = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1};
-    const wvb: WeeklyVisitorBias = {1: 1, 2: 10, 3: 100, 4: 120, 5: .20, 6: 2, 7: 3};
-    const mvb: MonthlyVisitorBias = {
+    const wvb: WeeklyVisitorBias = { description: 'default Weekly visitor Bias', name: 'Default', 1: 1, 2: 10, 3: 100, 4: 120, 5: .20, 6: 2, 7: 3};
+    const mvb: MonthlyVisitorBias = { description: 'default Weekly visitor Bias', name: 'Default',
         1: 1,
         2: 20,
         3: 30,
@@ -49,7 +49,8 @@ describe('VisitorService', () => {
     };
 
     const test_fixedCosts: FixedCosts = {
-        configName: 'defaultSettings',
+        configName: 'default systeme Settings',
+        description: 'default system setting',
         serviceCharge: {amount: 10, frequency: 'q', dayDue: 30},
         rent: {amount: 300, frequency: 'm', dayDue: 30},
         rates: {amount: 100, frequency: 'y', dayDue: 30},

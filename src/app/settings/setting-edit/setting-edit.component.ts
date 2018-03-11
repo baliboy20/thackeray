@@ -40,7 +40,6 @@ export class SettingEditComponent implements OnInit {
     }
 
     onClose() {
-        console.log('onclode', this.data, this.mode);
         this.ref.close();
     }
 

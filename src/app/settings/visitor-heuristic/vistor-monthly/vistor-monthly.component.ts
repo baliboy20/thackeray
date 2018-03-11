@@ -35,8 +35,6 @@ export class VistorMonthlyComponent implements OnInit {
     ngOnInit() {
         const [m, w] = this.service.retrieveTemporalBiases();
         this.monthlyVisitorBias = m;
-        // this.monthlyVisitorBias.splice(3,1);
-        console.log('VB', m);
         this.weeklyVisitorBias.concat(m);
 
     }
@@ -51,7 +49,7 @@ export class VistorMonthlyComponent implements OnInit {
     }
 
     onEditClicked(value, dup?: false) {
-        console.log('on edit clicked', value);
+
 
         if (value === undefined) {
             this.editMonthlyVisitorBias = Object.assign(MONTHLY_VISITOR_BIAS);
@@ -63,7 +61,7 @@ export class VistorMonthlyComponent implements OnInit {
         } else {
 
             this.editMonthlyVisitorBias =  Object.assign({}, value);
-            console.log('assigning')
+
             this.editState = 'NEW_REC';
         }
 
@@ -91,12 +89,12 @@ export class VistorMonthlyComponent implements OnInit {
     }
 
     onRemoveClicked(idx: number) {
-        console.log('The idx is', this.monthlyVisitorBias[idx], idx);
+
         // const cfg = {data:{name: 'charles'} };
         const cfg = {data:{name: this.monthlyVisitorBias[idx].name} }
         const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, cfg );
         dialogRef.afterClosed().subscribe(a => {
-             console.log('after closed', a);
+
             if (a.status === 'deleteConfirmed') {
                 this.monthlyVisitorBias.splice(idx, 1);
                 this.service.persistMonthlyBias(this.monthlyVisitorBias);

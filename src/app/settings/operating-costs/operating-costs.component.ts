@@ -51,20 +51,18 @@ export class OperatingCostsComponent implements OnInit {
 
     /* open edit dialog to amend/creat recored*/
     onEditClicked(value, dup?: false) {
-        console.log('on edit clicked', value);
+
 
         if (value === undefined) {
            this.editOc = Object.assign({}, OPERATING_COSTS);
-            console.log(this.editOc);
             this.editState = 'NEW_REC';
 
         } else if(!dup){
             this.editOc=  value ;
             this.editState = 'EDIT_REC';
         } else {
-console.log('dupong');
+
             this.editOc =  Object.assign({}, value);
-            console.log('assigning')
             this.editState = 'NEW_REC';
         }
 
@@ -91,12 +89,9 @@ console.log('dupong');
     }
 
     onRemoveClicked(idx: number) {
-        console.log('The idx is', this.oC[idx], idx);
-        // const cfg = {data:{name: 'charles'} };
         const cfg = {data:{name: this.oC[idx]['name']} }
         const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, cfg );
         dialogRef.afterClosed().subscribe(a => {
-            console.log('after closed', a);
             if (a.status === 'deleteConfirmed') {
                 this.oC.splice(idx, 1);
                 this.service.persistOperatingCosts(this.oC);

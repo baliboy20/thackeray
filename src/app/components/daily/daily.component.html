@@ -3,6 +3,13 @@
   <div class="table-item">
     <div class="table-col">Date</div>
     <div class="table-col"> Transactions</div>
+
+    <div class="table-col">Rent</div>
+    <div class="table-col">Rates</div>
+    <div class="table-col">S.Charge</div>
+    <div class="table-col">Leases</div>
+    <!--<div class="table-col">Salaries/div>-->
+
     <div class="table-col">Fixed Costs</div>
     <div class="table-col">Variable Costs</div>
     <div class="table-col">TotalCosts</div>
@@ -21,6 +28,14 @@
   <div class="table-item" *ngFor="let it of data$| async">
     <div class="table-col">{{it[fld]}}</div>
     <div class="table-col"> {{it.trades|numFmt}}</div>
+
+    <div class="table-col">{{it.rent |numFmt}}</div>
+    <div class="table-col">{{it.rates |numFmt}}</div>
+    <div class="table-col">{{it.serviceCharge |numFmt}}</div>
+    <div class="table-col">{{it.lease |numFmt}}</div>
+    <!--<div class="table-col">{{it.salaries |numFmt}}</div>-->
+
+
     <div class="table-col">{{it.fixedCosts |numFmt}}</div>
     <div class="table-col">{{it.variableCosts|numFmt}}</div>
     <div class="table-col">{{it.totalCosts|numFmt}}</div>

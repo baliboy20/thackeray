@@ -61,6 +61,7 @@ export class VisitorService {
 
     retrieveAssumptions() {
         const key = 'thackSettings';
+        console.log("ASSUMPTIONS", StoreLocalSettings.retrieve(key))
         return StoreLocalSettings.retrieve(key);
     }
 
@@ -98,7 +99,8 @@ export class VisitorService {
         return ForecastModelBasic.fixedCostAssumptions;
     }
 
-    applyAssumption(assum) {
+    applyAssumption(assum: FixedCosts) {
+        console.log("Apply assum", assum);
         ForecastModelBasic.fixedCostAssumptions = (assum);
     }
 
@@ -108,6 +110,7 @@ export class VisitorService {
     }
 
     applyCurrentWeeklyBias(value: WeeklyVisitorBias) {
+
         ForecastModelBasic.weeklyVisitorBias = value;
 
     }
@@ -146,7 +149,7 @@ export class VisitorService {
 export interface CostSalesSequent extends VisitorSequent {
     salaries: number;
     rent: number;
-    leased: number;
+    lease: number;
     serviceCharge: number;
     rates: number;
     fixedCosts: number;
@@ -203,6 +206,7 @@ export const computeVisitors = (month, isoWeekday, trades) => {
 };
 
 export interface FixedCosts {
+    _id? :string;
     configName: string;
     description: string;
     serviceCharge: { amount: number, frequency: string, dayDue: number };
@@ -239,6 +243,7 @@ const computeCumTotals: (a: CostSalesSequent, b: CostSalesSequent, i: number) =>
     };
 
 export interface MonthlyVisitorBias {
+    _id? :string;
     description: string;
     name: string;
     '1': number;
@@ -256,6 +261,7 @@ export interface MonthlyVisitorBias {
 }
 
 export const MONTHLY_VISITOR_BIAS: MonthlyVisitorBias = {
+    _id : '-1',
     description: 'Default config',
     name: 'DEFAULT',
     '1': .8,
@@ -273,6 +279,7 @@ export const MONTHLY_VISITOR_BIAS: MonthlyVisitorBias = {
 };
 
 export interface WeeklyVisitorBias {
+    _id?: string;
     description: string;
     name: string;
     1: number;
@@ -285,6 +292,7 @@ export interface WeeklyVisitorBias {
 }
 
 export const WEEKLY_VISITOR_BIAS: WeeklyVisitorBias = {
+    _id: '-1',
     description: 'Default config',
     name: 'DEFAULT',
     '1': 1, // su
@@ -297,14 +305,16 @@ export const WEEKLY_VISITOR_BIAS: WeeklyVisitorBias = {
 };
 
 export interface OperatingCosts {
-    staffPerDay: number,
-    tradesBase: number,
+    _id?: string;
+    staffPerDay: number;
+    tradesBase: number;
     // rent: number,
-    averageSale: number,
+    averageSale: number;
     // serviceCharge: number
 }
 
 export const OPERATING_COSTS = {
+    _id: '-1',
     name: 'Default Operating cost',
     description: 'initial values',
     staffPerDay: 200,
@@ -344,6 +354,7 @@ export const computeGroupOnPeriod = (a: any, b: string) => {
  *
  */
 export class FixedCostsImpl implements FixedCosts {
+    _id = '-1';
     configName = 'defaultSettings';
     description = 'Default Settings';
     serviceCharge = {amount: 14000 / 12, frequency: 'q', dayDue: 30};
@@ -368,8 +379,13 @@ export class StoreLocalSettings {
     static retrieve(key: string) {
 
         const data = window.localStorage.getItem(key);
-        const dat = JSON.parse(data);
-        return dat;
+        if(data === undefined){
+            return null;
+        } else {
+            const dat = JSON.parse(data);
+            return dat;
+        }
+
     }
 }
 
@@ -473,7 +489,6 @@ export class ForecastModelBasic {
     static computeRunningTotals(prev: CostSalesSequent, curr: CostSalesSequent, idx) {
 
         if (idx === 0) {
-            console.log('PREV', prev, curr)
             prev.cumProfit = prev.profit;
             prev.cumTotalSales = prev.netSales;
             prev.cumVat = prev.vatOnSales;
@@ -495,44 +510,50 @@ export class ForecastModelBasic {
 
 
     /**         -----------------
-                computeFixedCosts
+     computeFixedCosts
      */
     static computeFixedCosts(arg: DateSequent, fco: FixedCosts) {
         const dec2 = ForecastModelBasic.dec2;
         const v: number[] = [4, 7, 10, 1];
-
+// console.log("XXXXXXXXXXXX", fco);
         const fc: CostSalesSequent = arg as CostSalesSequent;
         let compCost = 0;
         const isDue = (arg1: VisitorSequent, v1: number[],
                        props: { amount: number, frequency: string, dayDue: number }) => {
+            let accum = 0;
             if (props.frequency === 'q') {
                 if (v.includes(arg1.month) && moment(arg1.date).format('D') === '1') {
                     compCost += props.amount;
+                    accum = props.amount;
                 }
             } else if (props.frequency === 'm') {
                 if (moment(arg1.date).format('D') === '1') {
                     compCost += props.amount;
+                    accum = props.amount;
                 }
 
             } else if (props.frequency === 'y') {
                 if (arg1.month === 1 && moment(arg1.date).format('D') === '1') {
                     compCost += props.amount;
+                    accum = props.amount;
                 }
 
             } else if (props.frequency === 'w') {
                 if (arg1.dayNo === 5) {
                     compCost += props.amount;
+                    accum = props.amount;
                 }
 
             } else {
                 throw new Error('period not known for prperty');
             }
+            return accum;
         };
 
-        isDue(fc, v, fco.rates);
-        isDue(fc, v, fco.lease);
-        isDue(fc, v, fco.rent);
-        isDue(fc, v, fco.serviceCharge);
+        fc.rates = isDue(fc, v, fco.rates);
+        fc.lease = isDue(fc, v, fco.lease);
+        fc.rent = isDue(fc, v, fco.rent);
+        fc.serviceCharge = isDue(fc, v, fco.serviceCharge);
         fc.fixedCosts = compCost;
         return fc;
     };

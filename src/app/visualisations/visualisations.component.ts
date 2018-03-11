@@ -69,9 +69,9 @@ export class VisualisationsComponent implements OnInit {
         const addTitles = `Trades \tNet Sales \tProfit \tVat on Sales \tVariable Costs \tDate\n`;
         const fmt2dec = (a) => {
             const arr = ['trades', 'netSales', 'profit', 'vatOnSales', 'variableCosts'];
-            // console.log('inside fm2dec', a)
+
                 arr.forEach(b => {
-                    // console.log('a[b]', b, a);
+
                     a[b] = (+a[b]).toFixed(2);
                 });
         return a;
@@ -94,7 +94,6 @@ export class VisualisationsComponent implements OnInit {
             .subscribe(b => {
                 data = b.toString().replace(/\,/g, '');
                 data.replace('0', 'z');
-                console.log('data', data);
 
             }, console.log, () => this.createDownloadElement(data));
 

@@ -1,0 +1,79 @@
+<mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            FIXED COSTS
+        </mat-panel-title>
+        <mat-panel-description>
+            Rent rates etc.
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <ng-container *ngTemplateOutlet="tmplListFc"></ng-container>
+
+</mat-expansion-panel>
+
+
+<ng-template #tmplListFc>
+    <mat-card>
+
+        <div *ngFor="let cost of fixedCosts; let i = index">
+
+            <div *ngFor="let fl of flds">
+                <ng-container *ngIf="fl.value !== 'configName' && fl.value !== 'description'; else tmpl1">
+                    <div style="padding: 5px">
+
+                        <!--<mat-form-field>-->
+                            <!--<input type="text" matInput [value]="fl.label">-->
+                        <!--</mat-form-field>-->
+<h3>{{fl.label}}</h3>
+                        <mat-form-field style="background-color: white" *ngFor="let ch of fl.children">
+                            <input type="text" matInput [value]="cost[fl.value][ch.value]" readonly>
+                            <mat-hint>{{ch.label}}</mat-hint>
+
+                        </mat-form-field>
+                    </div>
+
+
+                </ng-container>
+                <ng-template #tmpl1>
+                    <mat-form-field>
+                        <input type="text" matInput [value]="cost[fl.value]" readonly>
+                        <mat-hint>{{fl.label}}</mat-hint>
+                    </mat-form-field>
+                </ng-template>
+            </div>
+
+            <br>
+            <mat-toolbar style="margin-bottom: 5px ">
+                <button mat-icon-button
+                        class="action-icon"
+                        matTooltip="edit"
+                        (click)="onEditClicked(cost)">
+                    <mat-icon class="action-icon">create</mat-icon>
+                </button>
+                <button mat-icon-button
+                        class="action-icon"
+                        matTooltip="duplicat"
+                        (click)="onEditClicked(cost, true)">
+                    <mat-icon class="action-icon">content_copy</mat-icon>
+                </button>
+                <button mat-icon-button
+                        class="action-icon"
+                        matTooltip="create"
+                        (click)="onEditClicked()">
+                    <mat-icon class="action-icon">add</mat-icon>
+                </button>
+                <button mat-icon-button
+                        matTooltip="Delete"
+                        color="primary"
+                        (click)="onRemoveClicked(i)">
+                    <mat-icon class="action-icon">remove</mat-icon>
+                </button>
+                <!---->
+            </mat-toolbar>
+            <!---->
+        </div>
+
+    </mat-card>
+</ng-template>
+

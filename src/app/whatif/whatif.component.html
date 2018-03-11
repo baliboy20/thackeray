@@ -47,16 +47,47 @@
 
 
                    -->
+
+
+                        <app-scenario-selector
+                                placeholder = "Choose Scenes"
+                                matTooltip=" Rate, Eqp., S. Charge"
+                                [applyFuncName] = "'applyAssumption'"
+                                [settingTypeLabel]="'Fixed costs'"
+                                [retrieveFuncName] = "'retrieveAssumptions'"
+                                [labelName] = "'configName'">
+                        </app-scenario-selector>
                     <app-scenario-selector
                             placeholder = "Choose Scenes"
-                            [applyFuncName] = "'applyAssumption'"
-                            [retrieveFuncName] = "'retrieveAssumptions'"
-                            [labelName] = "'configName'">
+                            matTooltip="Decimal fraction of sales activity across week"
+                            [applyFuncName] = "'applyCurrentWeeklyBias'"
+                            [settingTypeLabel]="'Weekly sales activity'"
+                            [retrieveFuncName] = "'retrieveCurrentWeeklyBias'"
+                            [labelName] = "'name'">
                     </app-scenario-selector>
+
+                    <app-scenario-selector
+                            placeholder = "Choose Scenes"
+                            [applyFuncName] = "'applyCurrentMonthlyBias'"
+                            matTooltip="Decimal fraction of sales activity across month"
+                            [settingTypeLabel]="'Monthly sales trend'"
+                            [retrieveFuncName] = "'retrieveCurrentMonthlyBias'"
+                            [labelName] = "'name'">
+                    </app-scenario-selector>
+                    <app-scenario-selector
+                            placeholder = "Choose Scenes"
+                            matTooltip="Staff wages, Trade base, Average sale"
+                            [applyFuncName] = "'applyOperatingCosts'"
+                            [settingTypeLabel]="'Operating Costs'"
+                            [retrieveFuncName] = "'retrieveOperationgCosts'"
+                            [labelName] = "'name'">
+                    </app-scenario-selector>
+
                 </mat-card>
             </mat-tab>
             <mat-tab label="layout view"></mat-tab>
         </mat-tab-group>
+        <!--<app-configure ></app-configure>-->
     </mat-sidenav>
     <div style="height: 50vh">
 

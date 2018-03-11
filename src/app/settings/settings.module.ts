@@ -10,6 +10,8 @@ import {ConfirmDeleteDialogComponent} from '../components/confirm-delete-dialog/
 import {VistorMonthlyComponent} from './visitor-heuristic/vistor-monthly/vistor-monthly.component';
 import {VisitorWeeklyComponent} from './visitor-heuristic/visitor-weekly/visitor-weekly.component';
 import {OperatingCostsComponent} from './operating-costs/operating-costs.component';
+import {FixedCostsComponent} from './fixed-costs/fixed-costs.component';
+import {FixedCostEditComponent} from './fixed-costs/fixed-cost-edit/fixed-cost-edit.component';
 
 const route: Routes = [
     {path: 'settings', component: SettingsComponent}
@@ -30,12 +32,20 @@ const route: Routes = [
         ConfirmDeleteDialogComponent,
         VisitorWeeklyComponent,
         OperatingCostsComponent,
+        FixedCostsComponent,
+        FixedCostEditComponent,
 
     ],
-    entryComponents: [SettingEditComponent, ConfirmDeleteDialogComponent],
-    exports: [SettingsComponent,
+    entryComponents: [SettingEditComponent,
+        FixedCostsComponent,
+        FixedCostEditComponent,
+        ConfirmDeleteDialogComponent],
+    exports: [
+        SettingsComponent,
         VistorMonthlyComponent,
         VisitorWeeklyComponent,
+        FixedCostEditComponent,
+        FixedCostsComponent,
         OperatingCostsComponent],
     providers: [
         {provide: MatDialogRef, useValue: {}},
