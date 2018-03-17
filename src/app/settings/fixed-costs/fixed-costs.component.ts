@@ -49,7 +49,7 @@ export class FixedCostsComponent implements OnInit {
     a(o, fld1, fld2) {
 
         const res = o[fld1][fld2];
-        console.log(o, fld1, fld2, res);
+        // console.log(o, fld1, fld2, res);
         return res;
     }
 
@@ -81,7 +81,7 @@ export class FixedCostsComponent implements OnInit {
 
     /* open edit dialog to amend/creat recored*/
     onEditClicked(value, dup?: false) {
-console.log("STATUS", value, dup);
+// console.log("STATUS", value, dup);
       let props = {};
 
         if (value === undefined) {
@@ -90,12 +90,12 @@ console.log("STATUS", value, dup);
             fc.description = ''
              props = {mode: 'NEW_REC', cfg:fc};
         } else if(!dup){
-            console.log('EDIT PATH');
+            // console.log('EDIT PATH');
             const fc  =  Object.assign({}, value);
             props = {mode: 'EDIT_REC', cfg: value};
 
         } else {
-            console.log('DUPE PATH');
+            // console.log('DUPE PATH');
             const fc  =  Object.assign({}, value);
             props = {mode: 'DUP_REC', cfg: fc};
         }

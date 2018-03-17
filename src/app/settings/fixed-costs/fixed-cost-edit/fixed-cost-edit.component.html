@@ -27,7 +27,7 @@
 
 <ng-template #list let-it="item">
   <form novalidate #fm1="ngForm">
-    <mat-form-field>
+    <mat-form-field style="font-size: 16px">
       <input type="text"
              (invalid)="onInvalid"
              matInput
@@ -87,7 +87,7 @@
             name="ddFrequency"
             [(ngModel)]="ob.frequency"
             placeholder="Period of reoccurence">
-      <mat-option *ngFor="let period of [{key:'m', value:'month'}, {key:'q', value:'quarter'}]"
+      <mat-option *ngFor="let period of [{key:'w', value:'week'}, {key:'m', value:'month'}, {key:'q', value:'quarter'}]"
                   [value]="period.key">
         {{ period.value }}
       </mat-option>

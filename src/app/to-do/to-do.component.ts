@@ -41,8 +41,8 @@ export class ToDoComponent implements OnInit {
 
     constructor(private srv: VisitorService) {
         const a = this.values.indexOf(this.values[5]);
-        console.log('INDEXOF TEST = ', a);
-        console.log('zz', this.items.map(a => a.title));
+        // console.log('INDEXOF TEST = ', a);
+        // console.log('zz', this.items.map(a => a.title));
     }
 
 
@@ -52,5 +52,9 @@ export class ToDoComponent implements OnInit {
     onClick() {
         this.selected = 3;
 
+    }
+
+    onDateChanged(val) {
+        this.selected =val;
     }
 }

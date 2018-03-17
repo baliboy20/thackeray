@@ -12,7 +12,7 @@ export class DailyComponent implements OnInit {
     data$: Observable<any>;
     fld = 'date';
     @Input() set data(value: Observable<any>) {
-       value.map((a: any[]) => (a.slice(0, 5))).subscribe(console.log);
+      // value.map((a: any[]) => (a.slice(0, 5))).subscribe(console.log);
        this.data$ = value;
     }
 

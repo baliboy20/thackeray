@@ -14,73 +14,67 @@
             <mat-tab label="model inputs">
                 <mat-card>
                     <form novalidate #fm="ngForm">
+                        <div style="background-color: hotpink">
+                            <app-memory-date-selector
+                                    [localStorageName]="'Report_date_selector_FROM'"
+                                    (dateChangedEvent)="onDateChanged('from',$event)">
+                            </app-memory-date-selector>
 
-                        <mat-form-field>
-                            <input matInput
-                                   [ngModel]="_from"
-                                   name="from"
-                                   [matDatepicker]="pickerFrom"
-                                   placeholder="Choose date to"
-                                   (dateChange)="onDateChanged('from',$event)">
-                            <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
-                            <mat-datepicker #pickerFrom></mat-datepicker>
-                        </mat-form-field>
-                        <div style="display: inline-block;padding:13px">To</div>
-                        <mat-form-field>
-                            <input matInput
-                                   [ngModel]="_to"
-                                   name="to"
-                                   [matDatepicker]="pickerTo"
-                                   placeholder="Choose date from"
-                                   (dateChange)="onDateChanged('to', $event)">
-                            <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
-                            <mat-datepicker #pickerTo></mat-datepicker>
-                        </mat-form-field>
+                            <app-memory-date-selector
+                                    [localStorageName]="'Report_date_selector_TO'"
+                                    (dateChangedEvent)="onDateChanged('to',$event)">
+                            </app-memory-date-selector>
+
+                        </div>
                         <br>
                         <button mat-raised-button color="primary" (click)="onRecompute()">COMPUTE</button>
                         <br>
                     </form>
-                   <!--
-                   applyFuncName = 'applyAssumption';
-    @Input() retrieveFuncName = 'retrieveAssumptions';
-    @Input() labelName = 'name';
+                    <!--
+                    applyFuncName = 'applyAssumption';
+     @Input() retrieveFuncName = 'retrieveAssumptions';
+     @Input() labelName = 'name';
 
 
-                   -->
+                    -->
 
 
-                        <app-scenario-selector
-                                placeholder = "Choose Scenes"
-                                matTooltip=" Rate, Eqp., S. Charge"
-                                [applyFuncName] = "'applyAssumption'"
-                                [settingTypeLabel]="'Fixed costs'"
-                                [retrieveFuncName] = "'retrieveAssumptions'"
-                                [labelName] = "'configName'">
-                        </app-scenario-selector>
                     <app-scenario-selector
-                            placeholder = "Choose Scenes"
+                            placeholder="Choose Scenes"
+                            matTooltip=" Rate, Eqp., S. Charge"
+                            (changed)="onChanged()"
+                            [applyFuncName]="'applyAssumption'"
+                            [settingTypeLabel]="'Fixed costs'"
+                            [retrieveFuncName]="'retrieveAssumptions'"
+                            [labelName]="'configName'">
+                    </app-scenario-selector>
+                    <app-scenario-selector
+                            placeholder="Choose Scenes"
                             matTooltip="Decimal fraction of sales activity across week"
-                            [applyFuncName] = "'applyCurrentWeeklyBias'"
+                            (changed)="onChanged()"
+                            [applyFuncName]="'applyCurrentWeeklyBias'"
                             [settingTypeLabel]="'Weekly sales activity'"
-                            [retrieveFuncName] = "'retrieveCurrentWeeklyBias'"
-                            [labelName] = "'name'">
+                            [retrieveFuncName]="'retrieveCurrentWeeklyBias'"
+                            [labelName]="'name'">
                     </app-scenario-selector>
 
                     <app-scenario-selector
-                            placeholder = "Choose Scenes"
-                            [applyFuncName] = "'applyCurrentMonthlyBias'"
+                            placeholder="Choose Scenes"
+                            [applyFuncName]="'applyCurrentMonthlyBias'"
                             matTooltip="Decimal fraction of sales activity across month"
+                            (changed)="onChanged()"
                             [settingTypeLabel]="'Monthly sales trend'"
-                            [retrieveFuncName] = "'retrieveCurrentMonthlyBias'"
-                            [labelName] = "'name'">
+                            [retrieveFuncName]="'retrieveCurrentMonthlyBias'"
+                            [labelName]="'name'">
                     </app-scenario-selector>
                     <app-scenario-selector
-                            placeholder = "Choose Scenes"
+                            placeholder="Choose Scenes"
                             matTooltip="Staff wages, Trade base, Average sale"
-                            [applyFuncName] = "'applyOperatingCosts'"
+                            (changed)="onChanged()"
+                            [applyFuncName]="'applyOperatingCosts'"
                             [settingTypeLabel]="'Operating Costs'"
-                            [retrieveFuncName] = "'retrieveOperationgCosts'"
-                            [labelName] = "'name'">
+                            [retrieveFuncName]="'retrieveOperationgCosts'"
+                            [labelName]="'name'">
                     </app-scenario-selector>
 
                 </mat-card>

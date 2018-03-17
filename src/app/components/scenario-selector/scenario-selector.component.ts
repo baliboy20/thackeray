@@ -1,6 +1,7 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {VisitorService} from '../../generators/visitor/visitor.service';
 import {MatOption, MatSelect} from '@angular/material';
+import {isNull} from 'util';
 
 @Component({
     selector: 'app-scenario-selector',
@@ -14,12 +15,16 @@ export class ScenarioSelectorComponent implements OnInit {
     @Input() public labelName: string = 'name';
     @Input() public settingTypeLabel: string = 'some name';
     @ViewChild(MatSelect) select: MatSelect;
+    @Output() public changed: EventEmitter<any> = new EventEmitter<any>()
     selected = -1;
 
     ngOnInit(): void {
 
         this.scenes = this.service[this.retrieveFuncName].call(this);
-        console.log("SCENES", this.scenes);
+        if(! this.scenes){
+            return;
+        }
+        // console.log("SCENES", this.scenes);
         this.fromStorage();
     }
 
@@ -31,25 +36,26 @@ export class ScenarioSelectorComponent implements OnInit {
 
     selectionChanged($event) {
         const idx = $event.value;
-        console.log('SELECCTION CHANGED EVENT',idx);
+       // console.log('SELECCTION CHANGED EVENT',idx, this.applyFuncName);
         this.service[this.applyFuncName].call(this, this.scenes[idx]);
         this.toStorage(this.scenes[idx]);
+        this.changed.emit(idx);
 
     }
 
     fromStorage() {
         if(this.retrieveFuncName === 'undefined') {
-            console.log('retrieve func name is undefined');
+            // console.log('retrieve func name is undefined');
             return;
         }
         const res = window.localStorage.getItem(this.retrieveFuncName);
-        if (res === 'undefined') {
+        if (res === 'undefined' || isNull(res)) {
             return;
         } else {
-            console.log('ZZZZww RETRIEVED FROM: ',  res);
+
             const obj = JSON.parse(res);
             const ff: number = this.scenes.findIndex(a => a[this.labelName] === obj[this.labelName] ) ;
-            console.log("ZZZZpp parsed sesseion cookes is", ff)
+
             this.selected = ff;
         }
     }

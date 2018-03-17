@@ -8,8 +8,15 @@
      <!--<mat-option *ngFor="let op of values; let key=index" [value]="key">{{op.label}}</mat-option>-->
    <!--</mat-select>-->
   <!--</mat-form-field>-->
+    <app-memory-date-selector
+            [localStorageName]="'IVAN_THE_TERRIBLE'"
+    (dateChangedEvent)="onDateChanged($event)"
+    >
 
- values: {{selected|json}}
+    </app-memory-date-selector>
+
+
+ values: {{selected}}
   <mat-toolbar>
     <button mat-raised-button (click)="onClick()">SET</button>
   </mat-toolbar>

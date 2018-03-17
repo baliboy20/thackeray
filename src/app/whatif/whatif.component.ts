@@ -77,16 +77,20 @@ export class WhatifComponent implements OnInit {
                 null)
                 .toArray()
                 .subscribe(a => this.data$.next(a));
-        }, 15);
+        }, 50);
 
     }
 
     onDateChanged(to, event) {
         if (to === 'from') {
-            this._from = event.target.value;
+            this._from = event;
         } else {
-            this._to = event.target.value;
+            this._to = event;
         }
+        this.onRecompute();
+    }
+
+    onChanged(val) {
         this.onRecompute();
     }
 

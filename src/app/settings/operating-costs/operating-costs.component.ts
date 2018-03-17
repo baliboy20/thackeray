@@ -72,7 +72,7 @@ export class OperatingCostsComponent implements OnInit {
                 return;
             } else {
                 if (this.editState === 'NEW_REC') {
-                   console.log('in newrec', this.editOc);
+                   // console.log('in newrec', this.editOc);
                     this.oC.push(this.editOc);
                 }
                 this.service.persistOperatingCosts(this.oC);

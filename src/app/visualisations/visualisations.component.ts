@@ -34,8 +34,8 @@ export class VisualisationsComponent implements OnInit {
 
     groupby = ['year', 'week', 'month', 'quarter'];
     selectedGroupBy: 'week';
-    _from = new Date('02/13/2018');
-    _to = new Date('08/13/2018');
+    _from ;
+    _to ;
 
     constructor(private  service: VisitorService, private rnd: Renderer2, private  ele: ElementRef) {
     }
@@ -100,16 +100,22 @@ export class VisualisationsComponent implements OnInit {
     }
 
     onDateChanged(to, event) {
-        if (to === 'from') {
-            this._from = event.target.value;
-        } else {
-            this._to = event.target.value;
+        if(! event) {
+            // console.log('BUDDYIES', event );
+
+            return;
         }
+        if (to === 'from') {
+            this._from = event ;
+        } else {
+            this._to = event ;
+        }
+        // console.log("$$$$$$  ", to, event  );
         this.runOrRerun();
     }
 
     createDownloadElement(value) {
-        console.log('DOWNLOADING...');
+        // console.log('DOWNLOADING...');
         const rn = this.rnd;
         const ele1: HTMLAnchorElement = rn.createElement('a') as HTMLAnchorElement;
         rn.appendChild(this.ele.nativeElement, ele1);

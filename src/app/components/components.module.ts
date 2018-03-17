@@ -10,6 +10,7 @@ import {MaterialsModule} from '../../materials/materials.module';
 import {FormsModule} from '@angular/forms';
 import {VisitorService} from '../generators/visitor/visitor.service';
 import {MemoryDateSelectorComponent} from './memory-date-selector/memory-date-selector.component';
+// import {MemoryDateSelectorComponent} from './memory-date-selector/memory-date-selector.component';
 
 /**
  * related post:
@@ -28,12 +29,12 @@ import {MemoryDateSelectorComponent} from './memory-date-selector/memory-date-se
         AggPeriodComponent,
         NumFmtPipe,
         ScenarioSelectorComponent,
-        MemoryDateSelectorComponent
+       MemoryDateSelectorComponent
     ],
     exports: [DailyComponent,
         AggPeriodComponent,
         ScenarioSelectorComponent,
-        MemoryDateSelectorComponent
+       MemoryDateSelectorComponent
     ],
     providers: [VisitorService,
         {

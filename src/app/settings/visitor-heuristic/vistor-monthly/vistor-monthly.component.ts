@@ -1,7 +1,11 @@
 import {Component, Inject, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {MONTHLY_VISITOR_BIAS, MonthlyVisitorBias, VisitorService, WeeklyVisitorBias} from '../../../generators/visitor/visitor.service';
+import {
+    MONTHLY_VISITOR_BIAS, MonthlyVisitorBias, VisitorService, WEEKLY_VISITOR_BIAS,
+    WeeklyVisitorBias
+} from '../../../generators/visitor/visitor.service';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
 import {ConfirmDeleteDialogComponent} from '../../../components/confirm-delete-dialog/confirm-delete-dialog.component';
+import {isNull} from "util";
 
 @Component({
     selector: 'app-vistor-monthly',
@@ -17,8 +21,8 @@ export class VistorMonthlyComponent implements OnInit {
 
     private currMonthlyVisitorBias: MonthlyVisitorBias;
     private editMonthlyVisitorBias: MonthlyVisitorBias;
-    private currWeeklyVisitorBias: WeeklyVisitorBias;
-    private editWeeklyVisitorBias: WeeklyVisitorBias;
+    // private currWeeklyVisitorBias: WeeklyVisitorBias;
+    // private editWeeklyVisitorBias: WeeklyVisitorBias;
     private editState = 'EDIT_REC';
     private monthFlds = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL',
         'AUG', 'SEP', 'OCT', 'DEC'];
@@ -34,8 +38,11 @@ export class VistorMonthlyComponent implements OnInit {
 
     ngOnInit() {
         const [m, w] = this.service.retrieveTemporalBiases();
-        this.monthlyVisitorBias = m;
-        this.weeklyVisitorBias.concat(m);
+        if (isNull(m) || m.length === 0) {
+            this.monthlyVisitorBias.push(Object.assign({}, MONTHLY_VISITOR_BIAS));
+        } else {
+            this.monthlyVisitorBias = m;
+        }
 
     }
 
@@ -45,7 +52,8 @@ export class VistorMonthlyComponent implements OnInit {
     }
 
     modelChange(event) {
-        this.service.applyCurrentBiases([this.currMonthlyVisitorBias, this.currWeeklyVisitorBias]);
+        // this.service.applyCurrentBiases([this.currMonthlyVisitorBias, this.currMonthlyVisitorBias]);
+        this.service.applyCurrentMonthlyBias(this.currMonthlyVisitorBias);
     }
 
     onEditClicked(value, dup?: false) {

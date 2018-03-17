@@ -62,7 +62,7 @@ export class SettingsComponent implements OnInit {
         });
         dialogRef.afterClosed()
             .subscribe((a) => {
-                console.log('edit statie', a);
+                // console.log('edit statie', a);
                 if (a === undefined) {
                     return;
                 } else if (a.mode === 'NEW_REC') {

@@ -34,27 +34,42 @@
            </mat-radio-group>
        <br> <br>
        <br> <br>
-       <mat-form-field>
-           <input matInput
-                  [ngModel]="_from"
-                  name="from"
-                  [matDatepicker]="pickerFrom"
-                  placeholder="Choose date to"
-                  (dateChange)="onDateChanged('from',$event)">
-           <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
-           <mat-datepicker #pickerFrom></mat-datepicker>
-       </mat-form-field>
-        <div style="display: inline-block;padding:13px">To</div>
-       <mat-form-field>
-           <input matInput
-                  [ngModel]="_to"
-                  name="to"
-                  [matDatepicker]="pickerTo"
-                  placeholder="Choose date from"
-                  (dateChange)="onDateChanged('to', $event)">
-           <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
-           <mat-datepicker #pickerTo></mat-datepicker>
-       </mat-form-field>
+       <div style="border: 1px solid gainsboro">
+
+           <app-memory-date-selector
+                   [localStorageName]="'Report_date_selector_FROM'"
+                   (dateChangedEvent)="onDateChanged('from',$event)" >
+           </app-memory-date-selector>
+
+           <app-memory-date-selector
+                   [localStorageName]="'Report_date_selector_TO'"
+                   (dateChangedEvent)="onDateChanged('to',$event)" >
+           </app-memory-date-selector>
+
+
+
+       </div>
+       <!--<mat-form-field>-->
+           <!--<input matInput-->
+                  <!--[ngModel]="_from"-->
+                  <!--name="from"-->
+                  <!--[matDatepicker]="pickerFrom"-->
+                  <!--placeholder="Choose date to"-->
+                  <!--(dateChange)="onDateChanged('from',$event)">-->
+           <!--<mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>-->
+           <!--<mat-datepicker #pickerFrom></mat-datepicker>-->
+       <!--</mat-form-field>-->
+        <!--<div style="display: inline-block;padding:13px">To</div>-->
+       <!--<mat-form-field>-->
+           <!--<input matInput-->
+                  <!--[ngModel]="_to"-->
+                  <!--name="to"-->
+                  <!--[matDatepicker]="pickerTo"-->
+                  <!--placeholder="Choose date from"-->
+                  <!--(dateChange)="onDateChanged('to', $event)">-->
+           <!--<mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>-->
+           <!--<mat-datepicker #pickerTo></mat-datepicker>-->
+       <!--</mat-form-field>-->
 
    </mat-card>
 </form>

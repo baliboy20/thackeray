@@ -24,6 +24,7 @@ import {error} from 'util';
 import {reduce} from 'rxjs/operators';
 import {scan} from 'rxjs/operator/scan';
 import {of} from 'rxjs/observable/of';
+import {Error} from 'tslint/lib/error';
 
 
 /**                 ************
@@ -61,7 +62,7 @@ export class VisitorService {
 
     retrieveAssumptions() {
         const key = 'thackSettings';
-        console.log("ASSUMPTIONS", StoreLocalSettings.retrieve(key))
+        // console.log("ASSUMPTIONS", StoreLocalSettings.retrieve(key))
         return StoreLocalSettings.retrieve(key);
     }
 
@@ -121,8 +122,8 @@ export class VisitorService {
     }
 
     applyOperatingCosts(value: OperatingCosts) {
+      console.log('APPLY OPERATING COSTS', value);
         ForecastModelBasic.operatingCosts = value;
-
     }
 
 
@@ -131,7 +132,7 @@ export class VisitorService {
     }
 
     persistMonthlyBias(values: WeeklyVisitorBias[]) {
-        console.log('persist monthly bias', values);
+         // console.log('persist monthly bias', values);
         StoreLocalSettings.save(values, VisitorService.key.MONTHLY_VISITOR_BIAS);
     }
 
@@ -539,7 +540,8 @@ export class ForecastModelBasic {
                 }
 
             } else if (props.frequency === 'w') {
-                if (arg1.dayNo === 5) {
+                if (arg1.isoWeekday === 5) {
+                    // console.log("WE ARE IN WEEKLY TREE")
                     compCost += props.amount;
                     accum = props.amount;
                 }
@@ -607,29 +609,29 @@ export class ForecastModelBasic {
     /**
      * Visitor numbers have two trend annual footfall,
      */
-    static observableVistorGenerator(from1: string = '01/01/2018', to: string = '04/01/2018',
-                                     bucket: string = 'day'): Observable<number> {
-
-        return Observable.create((observer: Observer<any>) => {
-                let frm = from1;
-                let dayno = 0;
-                while (moment(frm).isSameOrBefore(to)) {
-                    frm = moment(from1).add(dayno, 'd').toISOString();
-                    const v: any = {
-                        dateBucket: bucket,
-                        dayNo: dayno,
-                        date: frm,
-                    } as any;
-                    observer.next(v);
-                    dayno++;
-                    if (dayno > 2140) {
-                        break;
-                    }
-                }
-                observer.complete();
-            }
-        );
-    }
+    // static observableVistorGenerator(from1: string = '01/01/2018', to: string = '04/01/2018',
+    //                                  bucket: string = 'day'): Observable<number> {
+    //
+    //     return Observable.create((observer: Observer<any>) => {
+    //             let frm = from1;
+    //             let dayno = 0;
+    //             while (moment(frm).isSameOrBefore(to)) {
+    //                 frm = moment(from1).add(dayno, 'd').toISOString();
+    //                 const v: any = {
+    //                     dateBucket: bucket,
+    //                     dayNo: dayno,
+    //                     date: frm,
+    //                 } as any;
+    //                 observer.next(v);
+    //                 dayno++;
+    //                 if (dayno > 2140) {
+    //                     break;
+    //                 }
+    //             }
+    //             observer.complete();
+    //         }
+    //     );
+    // }
 
     /** */
     static computeNetSales: (a: CostSalesSequent, averageSale: number) => CostSalesSequent = (a: CostSalesSequent, averageSale: number) => {
